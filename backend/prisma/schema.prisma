@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  full_name    String
+  is_corporate Boolean  @default(false)
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  applications Application[]
+  @@map("users")
+}
+
+// ─── Applications ─────────────────────────────────────────────────────────────
+
+model Application {
+  id           String            @id @default(uuid())
+  user_id      String
+  user         User              @relation(fields: [user_id], references: [id])
+
+  status       ApplicationStatus @default(DRAFT)
+  wizard_step  Int               @default(1)
+
+  category_id    String?
+  subcategory_id String?
+  llm_confidence Float?
+
+  title       String?
+  description String?  @db.Text
+
+  // JSON snapshot of the applicant profile at time of filing
+  applicant_profile_snapshot Json?
+
+  // Array of co-owners
+  owners Json @default("[]")
+
+  // Category-specific metadata fields
+  work_metadata Json @default("{}")
+
+  // KECOBO portal fields
+  kecobo_reference      String?
+  kecobo_status         String?
+  kecobo_last_checked_at DateTime?
+  rejection_reason      String?  @db.Text
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  documents  ApplicationDocument[]
+  audit_logs AuditLog[]
+  filing_jobs FilingJob[]
+
+  @@map("applications")
+}
+
+enum ApplicationStatus {
+  DRAFT
+  READY_FOR_FILING
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+// ─── Documents ────────────────────────────────────────────────────────────────
+
+model ApplicationDocument {
+  id             String       @id @default(uuid())
+  application_id String
+  application    Application  @relation(fields: [application_id], references: [id], onDelete: Cascade)
+
+  type        DocumentType
+  document_id String       // schema document ID (e.g. "work_file", "id_document")
+  label       String
+  file_path   String
+  file_name   String
+  mime_type   String
+  size_bytes  Int
+
+  created_at DateTime @default(now())
+
+  @@map("application_documents")
+}
+
+enum DocumentType {
+  WORK_FILE
+  ID_DOCUMENT
+  DECLARATION_FORM
+  SUPPORTING
+  CERTIFICATE
+  SCREENSHOT
+}
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id             String      @id @default(uuid())
+  application_id String
+  application    Application @relation(fields: [application_id], references: [id])
+
+  from_status ApplicationStatus?
+  to_status   ApplicationStatus
+  triggered_by String           // "user" | "worker" | "scheduler"
+  note        String?           @db.Text
+
+  created_at DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// ─── Filing Jobs ──────────────────────────────────────────────────────────────
+
+model FilingJob {
+  id             String     @id @default(uuid())
+  application_id String
+  application    Application @relation(fields: [application_id], references: [id])
+
+  job_type   FilingJobType @default(INITIAL_FILING)
+  status     JobStatus     @default(QUEUED)
+  attempts   Int           @default(0)
+  error      String?       @db.Text
+  bull_job_id String?
+
+  queued_at    DateTime  @default(now())
+  started_at   DateTime?
+  completed_at DateTime?
+
+  @@map("filing_jobs")
+}
+
+enum FilingJobType {
+  INITIAL_FILING
+  NIGHTLY_SYNC
+  RESUBMISSION
+}
+
+enum JobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}

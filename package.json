@@ -1,0 +1,17 @@
+{
+  "name": "kira-copyright",
+  "private": true,
+  "workspaces": ["shared", "backend", "frontend", "worker"],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:worker": "npm run dev --workspace=worker",
+    "build": "npm run build --workspaces --if-present",
+    "db:migrate": "npm run prisma:migrate --workspace=backend",
+    "db:generate": "npm run prisma:generate --workspace=backend",
+    "db:studio": "npm run prisma:studio --workspace=backend"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

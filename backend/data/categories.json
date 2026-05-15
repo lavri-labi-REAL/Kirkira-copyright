@@ -1,0 +1,600 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kirkira.app/schemas/kecobo-categories/v1.0.0",
+  "title": "KECOBO Copyright Work Categories Schema",
+  "description": "Finalised category/subcategory taxonomy for KECOBO/NRR copyright registration, aligned with the Kenya Copyright Act No. 12 of 2001 (as amended 2022) and Copyright Regulations 2020.",
+  "version": "1.0.0",
+  "last_updated": "2025-01-01",
+  "source_legislation": [
+    "Kenya Copyright Act No. 12 of 2001 (amended 2022), Section 22(1)",
+    "Kenya Copyright Regulations 2020, Second Schedule (Fees)",
+    "NRR Portal — nrr.copyright.go.ke"
+  ],
+
+  "common_fields": {
+    "description": "Fields required for ALL categories regardless of work type.",
+    "fields": [
+      { "id": "title",              "label": "Title of Work",           "type": "string",  "required": true,  "max_length": 500 },
+      { "id": "description",        "label": "Description of Work",     "type": "text",    "required": true,  "max_length": 2000 },
+      { "id": "year_of_creation",   "label": "Year of Creation",        "type": "year",    "required": true },
+      { "id": "country_of_origin",  "label": "Country of Origin",       "type": "country", "required": true,  "default": "KE" },
+      { "id": "language",           "label": "Language of Work",        "type": "string",  "required": true },
+      { "id": "is_published",       "label": "Has the work been published?", "type": "boolean", "required": true },
+      { "id": "first_publication_date", "label": "Date of First Publication", "type": "date", "required_if": { "field": "is_published", "value": true } },
+      { "id": "first_publication_country", "label": "Country of First Publication", "type": "country", "required_if": { "field": "is_published", "value": true } },
+      { "id": "is_commissioned",    "label": "Was this work commissioned or created under employment?", "type": "boolean", "required": true },
+      { "id": "commissioner_name",  "label": "Commissioner / Employer Name", "type": "string", "required_if": { "field": "is_commissioned", "value": true } }
+    ]
+  },
+
+  "common_documents": {
+    "description": "Documents required for ALL categories.",
+    "documents": [
+      {
+        "id": "work_file",
+        "label": "Copy of the Work",
+        "required": true,
+        "description": "A digital copy of the work being registered.",
+        "accepted_formats": ["pdf", "doc", "docx", "mp3", "mp4", "wav", "aiff", "jpg", "jpeg", "png", "tiff", "zip"],
+        "max_size_mb": 50
+      },
+      {
+        "id": "id_document",
+        "label": "National ID or Passport",
+        "required": true,
+        "description": "Government-issued identity document of the applicant (individual) or authorised representative (corporate).",
+        "accepted_formats": ["jpg", "jpeg", "png", "pdf"],
+        "max_size_mb": 5
+      },
+      {
+        "id": "declaration_form",
+        "label": "Sworn Declaration of Ownership",
+        "required": true,
+        "description": "Signed declaration affirming the applicant is the owner/author of the work. Can be auto-generated from Kirkira template and e-signed.",
+        "accepted_formats": ["pdf"],
+        "max_size_mb": 5
+      }
+    ]
+  },
+
+  "categories": [
+
+    {
+      "id": "LIT",
+      "label": "Literary Works",
+      "act_reference": "Section 2, Copyright Act 2001",
+      "description": "Any writing-related work, irrespective of literary quality, including novels, academic works, scripts, code, and compilations.",
+      "nrr_label": "Literary Works",
+      "protection_duration": "50 years after the end of the year of the author's death.",
+      "subcategories": [
+        {
+          "id": "LIT-BOOK",
+          "label": "Book / Novel / Short Story Collection",
+          "examples": ["Novel", "Anthology", "Short story collection", "Poetry collection"],
+          "specific_fields": [
+            { "id": "genre",          "label": "Genre",             "type": "select",  "required": true,  "options": ["Fiction", "Non-fiction", "Poetry", "Drama", "Children's", "Other"] },
+            { "id": "num_pages",      "label": "Number of Pages",   "type": "integer", "required": true },
+            { "id": "isbn",           "label": "ISBN (if assigned)", "type": "string",  "required": false },
+            { "id": "publisher",      "label": "Publisher",          "type": "string",  "required": false },
+            { "id": "edition",        "label": "Edition",            "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "manuscript",     "label": "Full Manuscript or Published Copy", "required": true, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "LIT-ARTICLE",
+          "label": "Article / Essay / Research Paper",
+          "examples": ["Journal article", "Magazine essay", "Academic paper", "Blog post"],
+          "specific_fields": [
+            { "id": "publication_name", "label": "Name of Publication / Journal", "type": "string", "required": false },
+            { "id": "volume_issue",     "label": "Volume / Issue",                "type": "string", "required": false },
+            { "id": "doi",              "label": "DOI (if applicable)",            "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "article_file", "label": "Article / Paper Document", "required": true, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "LIT-SCRIPT",
+          "label": "Script / Screenplay / Play",
+          "examples": ["Film screenplay", "Stage play", "TV script", "Radio script"],
+          "specific_fields": [
+            { "id": "script_type",    "label": "Script Type",       "type": "select",  "required": true,  "options": ["Film Screenplay", "Stage Play", "TV Script", "Radio Script", "Other"] },
+            { "id": "num_pages",      "label": "Number of Pages",   "type": "integer", "required": true },
+            { "id": "genre",          "label": "Genre",             "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "script_file", "label": "Script Document", "required": true, "accepted_formats": ["pdf", "doc", "docx", "fdx"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "LIT-EDUCATIONAL",
+          "label": "Textbook / Educational Material / Curriculum",
+          "examples": ["School textbook", "Training manual", "Course notes", "Workbook"],
+          "specific_fields": [
+            { "id": "subject",         "label": "Subject / Discipline",          "type": "string",  "required": true },
+            { "id": "education_level", "label": "Education Level",               "type": "select",  "required": true, "options": ["Pre-primary", "Primary", "Secondary", "Tertiary", "Professional", "Adult / Continuing", "Other"] },
+            { "id": "num_pages",       "label": "Number of Pages",               "type": "integer", "required": true },
+            { "id": "publisher",       "label": "Publisher (if published)",      "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "material_file", "label": "Educational Material Document", "required": true, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "LIT-COMP-PROG",
+          "label": "Computer Program / Software",
+          "examples": ["Application software", "Mobile app", "Web application", "Firmware"],
+          "specific_fields": [
+            { "id": "software_name",    "label": "Software / Application Name",  "type": "string",  "required": true },
+            { "id": "version",          "label": "Version",                       "type": "string",  "required": true },
+            { "id": "programming_lang", "label": "Programming Language(s)",       "type": "string",  "required": true },
+            { "id": "platform",         "label": "Platform",                      "type": "select",  "required": true, "options": ["Web", "Android", "iOS", "Desktop (Windows)", "Desktop (macOS)", "Desktop (Linux)", "Embedded / Firmware", "Other"] },
+            { "id": "repo_url",         "label": "Repository URL (private/public)", "type": "url",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "source_code_excerpt", "label": "Source Code Excerpt or Architecture Documentation", "required": true, "accepted_formats": ["pdf", "zip", "txt"], "max_size_mb": 20, "note": "Full source code is not required; a representative excerpt or technical spec document is acceptable per KECOBO/NRR software guidelines." },
+            { "id": "software_screenshot", "label": "Screenshots / UI Samples",  "required": false, "accepted_formats": ["pdf", "jpg", "jpeg", "png", "zip"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "LIT-DATABASE",
+          "label": "Database / Compilation / Table",
+          "examples": ["Data compilation", "Directory", "Statistical table", "Curated dataset"],
+          "specific_fields": [
+            { "id": "num_records",    "label": "Approximate Number of Records / Entries", "type": "integer", "required": false },
+            { "id": "data_format",    "label": "Data Format",  "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "database_sample", "label": "Sample or Full Database Export", "required": true, "accepted_formats": ["pdf", "csv", "xlsx", "json", "zip"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "LIT-OTHER",
+          "label": "Other Literary Work",
+          "examples": ["Letter", "Report", "Memorandum", "Lecture notes", "Sermon", "Encyclopaedia entry", "Dictionary"],
+          "specific_fields": [
+            { "id": "literary_work_type", "label": "Type of Literary Work", "type": "string", "required": true }
+          ],
+          "specific_documents": [
+            { "id": "work_document", "label": "Work Document", "required": true, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 10 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "MUS",
+      "label": "Musical Works",
+      "act_reference": "Section 2, Copyright Act 2001",
+      "description": "Works consisting of music, irrespective of musical quality. Includes graphical notation (sheet music) and works composed for musical accompaniment. Note: the sound recording of a musical work is a separate category (SND).",
+      "nrr_label": "Music",
+      "protection_duration": "50 years after the end of the year of the author's death.",
+      "subcategories": [
+        {
+          "id": "MUS-SONG",
+          "label": "Song (Music + Lyrics)",
+          "examples": ["Pop song", "Gospel track", "Afrobeats track", "Traditional song arrangement"],
+          "specific_fields": [
+            { "id": "composer",       "label": "Composer(s)",         "type": "string",  "required": true },
+            { "id": "lyricist",       "label": "Lyricist(s)",         "type": "string",  "required": true },
+            { "id": "duration",       "label": "Duration (mm:ss)",    "type": "string",  "required": true },
+            { "id": "genre",          "label": "Genre",               "type": "string",  "required": false },
+            { "id": "isrc",           "label": "ISRC Code (if assigned)", "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "audio_file",    "label": "Audio Recording of the Work", "required": true,  "accepted_formats": ["mp3", "wav", "aiff", "flac", "m4a"], "max_size_mb": 50 },
+            { "id": "lyrics_sheet",  "label": "Lyrics Sheet",               "required": false, "accepted_formats": ["pdf", "doc", "docx", "txt"], "max_size_mb": 5 },
+            { "id": "sheet_music",   "label": "Sheet Music / Score",        "required": false, "accepted_formats": ["pdf"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "MUS-INSTRUMENTAL",
+          "label": "Instrumental Composition",
+          "examples": ["Orchestra score", "Piano piece", "Jingle", "Background score"],
+          "specific_fields": [
+            { "id": "composer",       "label": "Composer(s)",         "type": "string",  "required": true },
+            { "id": "duration",       "label": "Duration (mm:ss)",    "type": "string",  "required": true },
+            { "id": "instrumentation","label": "Instrumentation",     "type": "string",  "required": false },
+            { "id": "isrc",           "label": "ISRC Code (if assigned)", "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "audio_file",   "label": "Audio Recording",          "required": true,  "accepted_formats": ["mp3", "wav", "aiff", "flac"], "max_size_mb": 50 },
+            { "id": "sheet_music",  "label": "Sheet Music / Score",      "required": false, "accepted_formats": ["pdf"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "MUS-ARRANGEMENT",
+          "label": "Arrangement / Adaptation of Existing Work",
+          "examples": ["Orchestral arrangement of a folk song", "Remix", "Cover arrangement"],
+          "specific_fields": [
+            { "id": "arranger",              "label": "Arranger(s)",                    "type": "string",  "required": true },
+            { "id": "original_work_title",   "label": "Original Work Title",            "type": "string",  "required": true },
+            { "id": "original_author",       "label": "Original Author / Composer",     "type": "string",  "required": true },
+            { "id": "licence_or_permission", "label": "Licence / Permission Obtained?", "type": "boolean", "required": true },
+            { "id": "duration",              "label": "Duration (mm:ss)",               "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "audio_file",      "label": "Audio Recording of Arrangement", "required": true,  "accepted_formats": ["mp3", "wav", "aiff", "flac"], "max_size_mb": 50 },
+            { "id": "permission_letter","label": "Permission / Licence Letter from Original Rights Holder", "required": false, "accepted_formats": ["pdf"], "max_size_mb": 5 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "ART",
+      "label": "Artistic Works",
+      "act_reference": "Section 2, Copyright Act 2001",
+      "description": "Works of visual art including paintings, drawings, sculpture, photographs, maps, architectural works, and works of applied art. Irrespective of artistic quality.",
+      "nrr_label": "Artistic Works",
+      "protection_duration": "50 years after the end of the year of the author's death.",
+      "subcategories": [
+        {
+          "id": "ART-PAINTING",
+          "label": "Painting / Drawing / Print",
+          "examples": ["Oil painting", "Watercolour", "Digital illustration", "Lithograph", "Woodcut", "Engraving"],
+          "specific_fields": [
+            { "id": "medium",         "label": "Medium",              "type": "string",  "required": true },
+            { "id": "dimensions",     "label": "Dimensions (W x H)", "type": "string",  "required": false },
+            { "id": "is_digital",     "label": "Is this a digital work?", "type": "boolean", "required": true }
+          ],
+          "specific_documents": [
+            { "id": "high_res_image", "label": "High-Resolution Image of the Work", "required": true, "accepted_formats": ["jpg", "jpeg", "png", "tiff", "pdf"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "ART-SCULPTURE",
+          "label": "Sculpture / Three-Dimensional Work",
+          "examples": ["Sculpture", "Carving", "Installation art", "Ceramic work", "3D-printed art"],
+          "specific_fields": [
+            { "id": "material",       "label": "Material",            "type": "string",  "required": true },
+            { "id": "dimensions",     "label": "Dimensions (W x H x D)", "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "photographs",    "label": "Photographs of the Work (multiple angles)", "required": true, "accepted_formats": ["jpg", "jpeg", "png", "pdf", "zip"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "ART-PHOTO",
+          "label": "Photograph",
+          "examples": ["Portrait photography", "Documentary photography", "Artistic photography"],
+          "note": "Photographs that form part of an audio-visual work are registered under the Audio-Visual category.",
+          "specific_fields": [
+            { "id": "num_photos",     "label": "Number of Photographs (if registering a series)", "type": "integer", "required": false },
+            { "id": "series_title",   "label": "Series Title (if part of a series)",              "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "photo_files",    "label": "High-Resolution Photograph(s)", "required": true, "accepted_formats": ["jpg", "jpeg", "png", "tiff", "pdf", "zip"], "max_size_mb": 50 }
+          ]
+        },
+        {
+          "id": "ART-MAP",
+          "label": "Map / Plan / Diagram / Chart",
+          "examples": ["Cartographic map", "Architectural plan", "Technical diagram", "Infographic"],
+          "specific_fields": [
+            { "id": "map_type",       "label": "Type",                "type": "string",  "required": true },
+            { "id": "scale",          "label": "Scale (if applicable)","type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "map_file",       "label": "Map / Diagram File",  "required": true,  "accepted_formats": ["pdf", "jpg", "jpeg", "png", "tiff", "svg"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "ART-ARCHITECTURE",
+          "label": "Architectural Work",
+          "examples": ["Building design", "Architectural model", "Interior design plans"],
+          "specific_fields": [
+            { "id": "building_name",   "label": "Building / Project Name",       "type": "string",  "required": true },
+            { "id": "location",        "label": "Location of Structure (if built)", "type": "string","required": false },
+            { "id": "is_built",        "label": "Has the structure been built?",  "type": "boolean", "required": true }
+          ],
+          "specific_documents": [
+            { "id": "architectural_drawings", "label": "Architectural Drawings / Plans", "required": true, "accepted_formats": ["pdf", "dwg", "zip"], "max_size_mb": 30 },
+            { "id": "photos",           "label": "Photographs (if built)",        "required": false, "accepted_formats": ["jpg", "jpeg", "png", "pdf", "zip"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "ART-APPLIED",
+          "label": "Applied Art / Craft / Industrial Art",
+          "examples": ["Textile design", "Woven fabric pattern", "Jewellery design", "Handicraft", "Fashion design"],
+          "specific_fields": [
+            { "id": "craft_type",     "label": "Type of Craft / Applied Art",  "type": "string",  "required": true },
+            { "id": "material",       "label": "Material(s) Used",             "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "images",         "label": "Images / Photographs of the Work", "required": true, "accepted_formats": ["jpg", "jpeg", "png", "pdf", "zip"], "max_size_mb": 20 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "DRA",
+      "label": "Dramatic Works",
+      "act_reference": "Section 2, Copyright Act 2001",
+      "description": "Any work intended to be performed dramatically, including works of dance or mime.",
+      "nrr_label": "Dramatic Works",
+      "protection_duration": "50 years after the end of the year of the author's death.",
+      "subcategories": [
+        {
+          "id": "DRA-PLAY",
+          "label": "Stage Play / Theatre Production",
+          "examples": ["Stage play", "Musical theatre script", "Opera libretto"],
+          "specific_fields": [
+            { "id": "playwright",     "label": "Playwright / Author",         "type": "string",  "required": true },
+            { "id": "num_acts",       "label": "Number of Acts / Scenes",     "type": "integer", "required": false },
+            { "id": "duration",       "label": "Approximate Running Time",    "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "script_file",    "label": "Script Document",             "required": true, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "DRA-CHOREOGRAPHY",
+          "label": "Choreographic Work / Dance",
+          "examples": ["Dance choreography", "Ballet notation", "Performance art"],
+          "specific_fields": [
+            { "id": "choreographer",  "label": "Choreographer(s)",            "type": "string",  "required": true },
+            { "id": "dance_style",    "label": "Dance Style / Genre",         "type": "string",  "required": false },
+            { "id": "duration",       "label": "Duration of Performance",     "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "notation_or_video", "label": "Choreography Notation or Video Recording", "required": true, "accepted_formats": ["pdf", "mp4", "mov", "avi", "zip"], "max_size_mb": 50 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "AV",
+      "label": "Audio-Visual Works",
+      "act_reference": "Section 2, Copyright Act 2001",
+      "description": "Works expressed through a sequence of images (with or without sound), from which a moving picture can be reproduced. Includes films, TV series, videogames, and recorded performances. Excludes broadcasts.",
+      "nrr_label": "Video",
+      "protection_duration": "50 years from the end of the year in which the work was made, first made available to the public, or first published — whichever is latest.",
+      "subcategories": [
+        {
+          "id": "AV-FILM",
+          "label": "Film / Movie / Feature Film",
+          "examples": ["Short film", "Feature film", "Documentary", "Animated film"],
+          "specific_fields": [
+            { "id": "director",       "label": "Director(s)",                     "type": "string",  "required": true },
+            { "id": "producer",       "label": "Producer(s)",                     "type": "string",  "required": true },
+            { "id": "production_co",  "label": "Production Company",              "type": "string",  "required": false },
+            { "id": "duration",       "label": "Duration (mm:ss)",                "type": "string",  "required": true },
+            { "id": "film_genre",     "label": "Genre",                           "type": "string",  "required": false },
+            { "id": "isan",           "label": "ISAN (if assigned)",              "type": "string",  "required": false },
+            { "id": "format",         "label": "Format (e.g. 4K, HD, Standard)", "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "film_file",      "label": "Film File or Trailer",            "required": true,  "accepted_formats": ["mp4", "mov", "mkv", "avi"], "max_size_mb": 500, "note": "A trailer or representative excerpt is acceptable if the full file exceeds size limits." },
+            { "id": "screenplay",     "label": "Screenplay / Script",             "required": false, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 10 },
+            { "id": "chain_of_title", "label": "Chain of Title / Ownership Documentation", "required": false, "accepted_formats": ["pdf"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "AV-TV",
+          "label": "TV Series / Web Series / Episode",
+          "examples": ["TV drama series", "Reality show", "Web series", "Single episode"],
+          "specific_fields": [
+            { "id": "series_title",   "label": "Series Title",                    "type": "string",  "required": true },
+            { "id": "episode_title",  "label": "Episode Title (if single episode)","type": "string", "required": false },
+            { "id": "season_episode", "label": "Season / Episode Number",         "type": "string",  "required": false },
+            { "id": "director",       "label": "Director(s)",                     "type": "string",  "required": true },
+            { "id": "producer",       "label": "Producer(s)",                     "type": "string",  "required": true },
+            { "id": "broadcaster",    "label": "Broadcaster / Platform",          "type": "string",  "required": false },
+            { "id": "duration",       "label": "Duration per Episode (mm:ss)",    "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "episode_file",   "label": "Episode or Series Sample",        "required": true, "accepted_formats": ["mp4", "mov", "mkv"], "max_size_mb": 200 },
+            { "id": "script",         "label": "Script / Screenplay",             "required": false, "accepted_formats": ["pdf", "doc", "docx"], "max_size_mb": 10 }
+          ]
+        },
+        {
+          "id": "AV-DOCUMENTARY",
+          "label": "Documentary",
+          "examples": ["Short documentary", "Feature documentary", "Educational documentary"],
+          "specific_fields": [
+            { "id": "director",       "label": "Director(s)",                     "type": "string",  "required": true },
+            { "id": "producer",       "label": "Producer(s)",                     "type": "string",  "required": true },
+            { "id": "subject_matter", "label": "Subject Matter",                  "type": "string",  "required": true },
+            { "id": "duration",       "label": "Duration (mm:ss)",                "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "film_file",      "label": "Documentary File or Excerpt",     "required": true, "accepted_formats": ["mp4", "mov", "mkv"], "max_size_mb": 200 }
+          ]
+        },
+        {
+          "id": "AV-VIDEOGAME",
+          "label": "Video Game",
+          "examples": ["Mobile game", "Console game", "PC game", "Browser game"],
+          "specific_fields": [
+            { "id": "game_title",     "label": "Game Title",                      "type": "string",  "required": true },
+            { "id": "developer",      "label": "Developer",                       "type": "string",  "required": true },
+            { "id": "platform",       "label": "Platform(s)",                     "type": "string",  "required": true },
+            { "id": "genre",          "label": "Game Genre",                      "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "gameplay_video", "label": "Gameplay Video / Trailer",        "required": true,  "accepted_formats": ["mp4", "mov"], "max_size_mb": 100 },
+            { "id": "screenshots",    "label": "Screenshots",                     "required": false, "accepted_formats": ["jpg", "png", "pdf", "zip"], "max_size_mb": 20 }
+          ]
+        },
+        {
+          "id": "AV-OTHER",
+          "label": "Other Audio-Visual Work",
+          "examples": ["Music video", "Corporate video", "Educational video", "Animation"],
+          "specific_fields": [
+            { "id": "av_type",        "label": "Type of Audio-Visual Work",       "type": "string",  "required": true },
+            { "id": "director",       "label": "Director / Creator",              "type": "string",  "required": false },
+            { "id": "duration",       "label": "Duration (mm:ss)",                "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "video_file",     "label": "Video File or Excerpt",           "required": true, "accepted_formats": ["mp4", "mov", "mkv", "avi"], "max_size_mb": 200 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "SND",
+      "label": "Sound Recordings",
+      "act_reference": "Section 2 and Section 28, Copyright Act 2001",
+      "description": "The fixation of sounds of a performance or other sounds (not the underlying musical or literary work — those are separate). Includes studio recordings, spoken word recordings, and audiobooks.",
+      "nrr_label": "Music",
+      "protection_duration": "50 years from the end of the year in which the recording was first published.",
+      "note": "A sound recording and the underlying musical work are separately registrable. Register both if you own both.",
+      "subcategories": [
+        {
+          "id": "SND-ALBUM",
+          "label": "Music Album / EP",
+          "examples": ["Full studio album", "EP", "Mixtape", "Compilation album"],
+          "specific_fields": [
+            { "id": "artist",         "label": "Recording Artist(s)",             "type": "string",  "required": true },
+            { "id": "producer",       "label": "Record Producer(s)",              "type": "string",  "required": true },
+            { "id": "record_label",   "label": "Record Label (if applicable)",    "type": "string",  "required": false },
+            { "id": "num_tracks",     "label": "Number of Tracks",               "type": "integer", "required": true },
+            { "id": "total_duration", "label": "Total Duration",                  "type": "string",  "required": false },
+            { "id": "isrc",           "label": "ISRC Codes (if assigned)",        "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "audio_files",    "label": "Audio Files (all tracks or representative sample)", "required": true, "accepted_formats": ["mp3", "wav", "aiff", "flac", "zip"], "max_size_mb": 200 },
+            { "id": "track_listing",  "label": "Track Listing with Durations",   "required": false, "accepted_formats": ["pdf", "txt"], "max_size_mb": 2 }
+          ]
+        },
+        {
+          "id": "SND-SINGLE",
+          "label": "Single Track Recording",
+          "examples": ["Commercial single", "B-side", "Standalone recording"],
+          "specific_fields": [
+            { "id": "artist",         "label": "Recording Artist(s)",             "type": "string",  "required": true },
+            { "id": "producer",       "label": "Record Producer",                 "type": "string",  "required": true },
+            { "id": "duration",       "label": "Duration (mm:ss)",                "type": "string",  "required": true },
+            { "id": "isrc",           "label": "ISRC Code (if assigned)",         "type": "string",  "required": false }
+          ],
+          "specific_documents": [
+            { "id": "audio_file",     "label": "Audio File",                      "required": true, "accepted_formats": ["mp3", "wav", "aiff", "flac"], "max_size_mb": 50 }
+          ]
+        },
+        {
+          "id": "SND-SPOKEN",
+          "label": "Spoken Word Recording / Audiobook / Podcast",
+          "examples": ["Audiobook", "Recorded lecture", "Podcast episode", "Recorded speech"],
+          "specific_fields": [
+            { "id": "speaker",        "label": "Speaker / Narrator",              "type": "string",  "required": true },
+            { "id": "recording_type", "label": "Type of Spoken Word Recording",  "type": "select",  "required": true, "options": ["Audiobook", "Podcast", "Recorded Lecture / Speech", "Interview", "Other"] },
+            { "id": "duration",       "label": "Duration",                        "type": "string",  "required": true },
+            { "id": "underlying_text","label": "Title of Underlying Literary Work (if applicable)", "type": "string", "required": false }
+          ],
+          "specific_documents": [
+            { "id": "audio_file",     "label": "Audio File",                      "required": true, "accepted_formats": ["mp3", "wav", "aiff", "m4a"], "max_size_mb": 200 }
+          ]
+        }
+      ]
+    },
+
+    {
+      "id": "BRD",
+      "label": "Broadcasts",
+      "act_reference": "Section 2 and Section 29, Copyright Act 2001",
+      "description": "Transmission of sounds and/or images by wire or wireless means (including satellite) intended to be received by the public. A broadcast cannot qualify for copyright until it has been broadcast.",
+      "nrr_label": "Broadcasts",
+      "protection_duration": "50 years from the end of the year in which the broadcast was first made.",
+      "subcategories": [
+        {
+          "id": "BRD-RADIO",
+          "label": "Radio Broadcast / Programme",
+          "examples": ["Radio show", "Radio documentary", "Radio drama", "Live broadcast recording"],
+          "specific_fields": [
+            { "id": "broadcaster",    "label": "Broadcasting Organisation",       "type": "string",  "required": true },
+            { "id": "programme_name", "label": "Programme Name",                  "type": "string",  "required": true },
+            { "id": "broadcast_date", "label": "Date First Broadcast",            "type": "date",    "required": true },
+            { "id": "duration",       "label": "Duration",                        "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "broadcast_recording", "label": "Recording of the Broadcast", "required": true, "accepted_formats": ["mp3", "wav", "mp4"], "max_size_mb": 100 },
+            { "id": "broadcast_proof",     "label": "Proof of Broadcast (schedules, certificates)", "required": false, "accepted_formats": ["pdf"], "max_size_mb": 5 }
+          ]
+        },
+        {
+          "id": "BRD-TV",
+          "label": "Television Broadcast",
+          "examples": ["TV programme", "Live sports broadcast", "News broadcast"],
+          "specific_fields": [
+            { "id": "broadcaster",    "label": "Broadcasting Organisation",       "type": "string",  "required": true },
+            { "id": "programme_name", "label": "Programme Name",                  "type": "string",  "required": true },
+            { "id": "channel",        "label": "Channel",                         "type": "string",  "required": false },
+            { "id": "broadcast_date", "label": "Date First Broadcast",            "type": "date",    "required": true },
+            { "id": "duration",       "label": "Duration",                        "type": "string",  "required": true }
+          ],
+          "specific_documents": [
+            { "id": "broadcast_recording", "label": "Recording of the Broadcast", "required": true, "accepted_formats": ["mp4", "mkv", "mov"], "max_size_mb": 200 },
+            { "id": "broadcast_proof",     "label": "Proof of Broadcast",         "required": false, "accepted_formats": ["pdf"], "max_size_mb": 5 }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "optional_supporting_documents": {
+    "description": "These documents are not required by default but may be requested by KECOBO or strengthen the application.",
+    "documents": [
+      { "id": "assignment_agreement",    "label": "Assignment / Transfer Agreement",    "description": "Required if ownership has been transferred from the original author.", "accepted_formats": ["pdf"], "max_size_mb": 10 },
+      { "id": "employment_contract",     "label": "Employment Contract",               "description": "Required if the work was created under a contract of employment and ownership vests in the employer.", "accepted_formats": ["pdf"], "max_size_mb": 10 },
+      { "id": "commission_agreement",    "label": "Commission Agreement",              "description": "Required if the work was commissioned.", "accepted_formats": ["pdf"], "max_size_mb": 10 },
+      { "id": "co_authorship_agreement", "label": "Co-Authorship / Joint Ownership Agreement", "description": "Recommended where there are multiple authors / owners to clarify shares.", "accepted_formats": ["pdf"], "max_size_mb": 10 },
+      { "id": "business_registration",   "label": "Certificate of Business Registration / Company Certificate", "description": "Required if applicant is a corporate entity.", "accepted_formats": ["pdf"], "max_size_mb": 5 },
+      { "id": "power_of_attorney",       "label": "Power of Attorney / Letter of Authorisation", "description": "Required if a representative is filing on behalf of the owner.", "accepted_formats": ["pdf"], "max_size_mb": 5 }
+    ]
+  },
+
+  "fees": {
+    "description": "Registration fees as per the Copyright Regulations 2020, Second Schedule. Fees are subject to change. All amounts in Kenya Shillings (KES).",
+    "source": "Copyright Regulations 2020, Second Schedule",
+    "categories": [
+      { "category": "Literary Works",      "individual_kes": 1000, "corporate_kes": 5000 },
+      { "category": "Musical Works",       "individual_kes": 1000, "corporate_kes": 5000 },
+      { "category": "Artistic Works",      "individual_kes": 1000, "corporate_kes": 5000 },
+      { "category": "Dramatic Works",      "individual_kes": 1000, "corporate_kes": 5000 },
+      { "category": "Audio-Visual Works",  "individual_kes": 2000, "corporate_kes": 10000 },
+      { "category": "Sound Recordings",    "individual_kes": 1000, "corporate_kes": 5000 },
+      { "category": "Broadcasts",          "individual_kes": 2000, "corporate_kes": 10000 },
+      { "category": "Software / Computer Programs", "individual_kes": 1000, "corporate_kes": 5000, "note": "Registered under Literary Works per the Copyright Act." }
+    ],
+    "note": "NRR registration may be processed free of charge for some categories via the online portal. Verify current fees at nrr.copyright.go.ke before filing."
+  },
+
+  "llm_classification_hints": {
+    "description": "Guidance for LLM-assisted classification. Maps common user descriptions to category IDs.",
+    "hints": [
+      { "keywords": ["novel", "book", "story", "fiction", "non-fiction", "poetry", "poem", "chapter"],                        "suggested_category": "LIT", "suggested_subcategory": "LIT-BOOK" },
+      { "keywords": ["research paper", "article", "journal", "essay", "academic", "thesis", "dissertation"],                  "suggested_category": "LIT", "suggested_subcategory": "LIT-ARTICLE" },
+      { "keywords": ["screenplay", "script", "stage play", "theatre", "play", "TV script"],                                   "suggested_category": "LIT", "suggested_subcategory": "LIT-SCRIPT" },
+      { "keywords": ["textbook", "curriculum", "educational material", "training manual", "course"],                          "suggested_category": "LIT", "suggested_subcategory": "LIT-EDUCATIONAL" },
+      { "keywords": ["software", "app", "application", "code", "program", "website", "mobile app", "system"],                "suggested_category": "LIT", "suggested_subcategory": "LIT-COMP-PROG" },
+      { "keywords": ["database", "dataset", "compilation", "table", "directory", "data"],                                     "suggested_category": "LIT", "suggested_subcategory": "LIT-DATABASE" },
+      { "keywords": ["song", "music", "lyrics", "track", "composition", "beat", "afrobeats", "gospel", "bongo"],             "suggested_category": "MUS", "suggested_subcategory": "MUS-SONG" },
+      { "keywords": ["instrumental", "score", "orchestral", "jingle", "soundtrack", "piano", "guitar piece"],                "suggested_category": "MUS", "suggested_subcategory": "MUS-INSTRUMENTAL" },
+      { "keywords": ["arrangement", "remix", "cover", "adaptation of music"],                                                 "suggested_category": "MUS", "suggested_subcategory": "MUS-ARRANGEMENT" },
+      { "keywords": ["painting", "drawing", "illustration", "digital art", "print", "artwork", "canvas"],                    "suggested_category": "ART", "suggested_subcategory": "ART-PAINTING" },
+      { "keywords": ["sculpture", "carving", "3d art", "ceramic", "installation"],                                           "suggested_category": "ART", "suggested_subcategory": "ART-SCULPTURE" },
+      { "keywords": ["photograph", "photo", "photography", "image", "portrait", "landscape photo"],                          "suggested_category": "ART", "suggested_subcategory": "ART-PHOTO" },
+      { "keywords": ["map", "plan", "diagram", "chart", "blueprint", "infographic", "technical drawing"],                    "suggested_category": "ART", "suggested_subcategory": "ART-MAP" },
+      { "keywords": ["building", "architecture", "architectural", "design of building", "interior design"],                  "suggested_category": "ART", "suggested_subcategory": "ART-ARCHITECTURE" },
+      { "keywords": ["textile", "fabric", "woven", "handicraft", "jewellery", "fashion design", "applied art"],              "suggested_category": "ART", "suggested_subcategory": "ART-APPLIED" },
+      { "keywords": ["play", "theatre", "dramatic", "performance text", "stage production"],                                  "suggested_category": "DRA", "suggested_subcategory": "DRA-PLAY" },
+      { "keywords": ["choreography", "dance", "ballet", "performance art", "mime"],                                          "suggested_category": "DRA", "suggested_subcategory": "DRA-CHOREOGRAPHY" },
+      { "keywords": ["film", "movie", "short film", "cinema", "feature film", "animated film"],                              "suggested_category": "AV",  "suggested_subcategory": "AV-FILM" },
+      { "keywords": ["TV series", "web series", "series", "episode", "sitcom", "drama series"],                              "suggested_category": "AV",  "suggested_subcategory": "AV-TV" },
+      { "keywords": ["documentary", "docuseries", "documentary film"],                                                        "suggested_category": "AV",  "suggested_subcategory": "AV-DOCUMENTARY" },
+      { "keywords": ["video game", "game", "mobile game", "console game", "PC game"],                                        "suggested_category": "AV",  "suggested_subcategory": "AV-VIDEOGAME" },
+      { "keywords": ["music video", "corporate video", "animation", "video production", "advert", "promo"],                  "suggested_category": "AV",  "suggested_subcategory": "AV-OTHER" },
+      { "keywords": ["album", "EP", "mixtape", "studio recording", "record"],                                                 "suggested_category": "SND", "suggested_subcategory": "SND-ALBUM" },
+      { "keywords": ["single", "track", "audio recording"],                                                                   "suggested_category": "SND", "suggested_subcategory": "SND-SINGLE" },
+      { "keywords": ["audiobook", "spoken word", "podcast", "lecture recording", "speech recording"],                        "suggested_category": "SND", "suggested_subcategory": "SND-SPOKEN" },
+      { "keywords": ["radio broadcast", "radio programme", "radio show"],                                                     "suggested_category": "BRD", "suggested_subcategory": "BRD-RADIO" },
+      { "keywords": ["television broadcast", "TV programme", "broadcast", "live broadcast"],                                  "suggested_category": "BRD", "suggested_subcategory": "BRD-TV" }
+    ]
+  }
+}
