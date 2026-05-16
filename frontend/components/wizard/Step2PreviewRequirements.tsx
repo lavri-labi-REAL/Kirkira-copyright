@@ -38,9 +38,9 @@ export function Step2PreviewRequirements({ application, onNext, onBack }: Props)
           f.category.toLowerCase().includes(category?.label?.toLowerCase().split(" ")[0]?.toLowerCase())
         );
         if (fee) return (
-          <div className="bg-[#E8EAF6] border border-indigo-200 rounded-lg p-3 text-sm text-[#1A237E]">
+          <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 text-sm text-primary-700">
             <strong>Registration Fee:</strong> KES {fee.individual_kes.toLocaleString()} (individual) · KES {fee.corporate_kes.toLocaleString()} (corporate)
-            <span className="block text-xs text-indigo-400 mt-0.5">As per Copyright Regulations 2020, Second Schedule</span>
+            <span className="block text-xs text-primary-400 mt-0.5">As per Copyright Regulations 2020, Second Schedule</span>
           </div>
         );
       })()}
@@ -49,7 +49,7 @@ export function Step2PreviewRequirements({ application, onNext, onBack }: Props)
         {/* Required Fields */}
         <Card>
           <div className="flex items-center gap-2 mb-4">
-            <FormInput className="w-5 h-5 text-[#1A237E]" />
+            <FormInput className="w-5 h-5 text-primary-700" />
             <h3 className="font-semibold text-gray-900">Required Information</h3>
           </div>
           <div className="space-y-2">
@@ -81,7 +81,7 @@ export function Step2PreviewRequirements({ application, onNext, onBack }: Props)
         {/* Required Documents */}
         <Card>
           <div className="flex items-center gap-2 mb-4">
-            <FileText className="w-5 h-5 text-[#1A237E]" />
+            <FileText className="w-5 h-5 text-primary-700" />
             <h3 className="font-semibold text-gray-900">Required Documents</h3>
           </div>
           <div className="space-y-3">
@@ -104,7 +104,7 @@ export function Step2PreviewRequirements({ application, onNext, onBack }: Props)
                   Specific to {subcategory?.label}
                 </p>
                 {specificDocs.map((d: any) => (
-                  <div key={d.id} className="border border-indigo-100 rounded-lg p-3 bg-indigo-50/30">
+                  <div key={d.id} className="border border-primary-100 rounded-lg p-3 bg-primary-50/40">
                     <div className="flex items-center gap-2">
                       <CheckCircle className={`w-4 h-4 flex-shrink-0 ${d.required ? "text-[#00BCD4]" : "text-gray-300"}`} />
                       <span className="text-sm font-medium text-gray-900">{d.label}</span>

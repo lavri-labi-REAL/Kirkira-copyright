@@ -70,7 +70,7 @@ export function Step5WorkDetails({ application, onUpdate, onNext, onBack }: Prop
               <label key={opt} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
-                  className="accent-[#1A237E]"
+                  className="accent-amber-600"
                   checked={metadata[field.id] === (opt === "Yes")}
                   onChange={() => setField(field.id, opt === "Yes")}
                 />

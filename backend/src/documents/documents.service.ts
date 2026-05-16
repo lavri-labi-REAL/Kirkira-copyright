@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from "@nestjs/common";
+import { Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { ConfigService } from "@nestjs/config";
 import * as fs from "fs";
@@ -25,7 +25,6 @@ export class DocumentsService {
 
   async upload(
     applicationId: string,
-    userId: string,
     documentId: string,
     label: string,
     type: string,
@@ -33,7 +32,6 @@ export class DocumentsService {
   ) {
     const app = await this.prisma.application.findUnique({ where: { id: applicationId } });
     if (!app) throw new NotFoundException("Application not found");
-    if (app.user_id !== userId) throw new ForbiddenException();
 
     const allowedMimes = ALLOWED_TYPES[type] || ALLOWED_TYPES["supporting"];
     if (!allowedMimes.includes(file.mimetype)) {
@@ -48,7 +46,6 @@ export class DocumentsService {
     const filePath = path.join(appDir, storedName);
     fs.writeFileSync(filePath, file.buffer);
 
-    // Remove existing document of same type+documentId
     await this.prisma.applicationDocument.deleteMany({
       where: { application_id: applicationId, document_id: documentId },
     });
@@ -67,13 +64,12 @@ export class DocumentsService {
     });
   }
 
-  async delete(documentId: string, userId: string) {
+  async delete(documentId: string) {
     const doc = await this.prisma.applicationDocument.findUnique({
       where: { id: documentId },
       include: { application: true },
     });
     if (!doc) throw new NotFoundException();
-    if (doc.application.user_id !== userId) throw new ForbiddenException();
 
     if (fs.existsSync(doc.file_path)) fs.unlinkSync(doc.file_path);
     await this.prisma.applicationDocument.delete({ where: { id: documentId } });

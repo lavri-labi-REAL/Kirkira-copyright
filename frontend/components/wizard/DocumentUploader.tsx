@@ -114,7 +114,7 @@ export function DocumentUploader({ applicationId, document: doc, existingDocs }:
             {uploaded ? (
               <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
             ) : (
-              <FileText className={`w-4 h-4 flex-shrink-0 ${doc.required ? "text-[#1A237E]" : "text-gray-400"}`} />
+              <FileText className={`w-4 h-4 flex-shrink-0 ${doc.required ? "text-primary-700" : "text-gray-400"}`} />
             )}
             <span className="text-sm font-medium text-gray-900">{doc.label}</span>
             {!doc.required && (
@@ -156,15 +156,15 @@ export function DocumentUploader({ applicationId, document: doc, existingDocs }:
           className={clsx(
             "mt-3 border-2 border-dashed rounded-lg p-5 text-center cursor-pointer transition-colors",
             isDragActive
-              ? "border-[#1A237E] bg-[#E8EAF6]"
-              : "border-gray-200 hover:border-[#1A237E]/50 hover:bg-gray-50",
+              ? "border-primary bg-primary-50"
+              : "border-gray-200 hover:border-primary/50 hover:bg-gray-50",
             uploading && "opacity-50 cursor-not-allowed"
           )}
         >
           <input {...getInputProps()} />
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
-              <Loader className="w-6 h-6 text-[#1A237E] animate-spin" />
+              <Loader className="w-6 h-6 text-primary-700 animate-spin" />
               <span className="text-sm text-gray-500">Uploading...</span>
             </div>
           ) : (

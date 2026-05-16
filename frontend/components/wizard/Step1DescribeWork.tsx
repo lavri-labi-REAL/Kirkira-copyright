@@ -85,7 +85,7 @@ export function Step1DescribeWork({ application, onUpdate, onNext }: Props) {
           Describe your work <span className="text-red-500">*</span>
         </label>
         <textarea
-          className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A237E]/20 focus:border-[#1A237E] resize-none"
+          className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
           rows={5}
           placeholder="E.g. I wrote a novel about a Nairobi detective navigating corruption, spanning 340 pages, in the literary fiction genre..."
           value={description}
@@ -160,7 +160,7 @@ export function Step1DescribeWork({ application, onUpdate, onNext }: Props) {
       </div>
 
       {selectedCategory && (
-        <div className="bg-[#E8EAF6] rounded-lg p-3 text-sm text-[#1A237E]">
+        <div className="bg-primary-50 rounded-lg p-3 text-sm text-primary-700">
           <strong>{selectedCategory.label}:</strong> {selectedCategory.description}
         </div>
       )}

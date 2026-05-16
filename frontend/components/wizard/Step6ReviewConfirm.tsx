@@ -47,7 +47,7 @@ export function Step6ReviewConfirm({ application, onConfirm, onBack }: Props) {
   const Section = ({ title, icon: Icon, children }: any) => (
     <div className="bg-gray-50 rounded-xl p-5 space-y-3">
       <div className="flex items-center gap-2 mb-1">
-        <Icon className="w-5 h-5 text-[#1A237E]" />
+        <Icon className="w-5 h-5 text-primary-700" />
         <h3 className="font-semibold text-gray-900 text-sm">{title}</h3>
       </div>
       {children}
@@ -139,14 +139,14 @@ export function Step6ReviewConfirm({ application, onConfirm, onBack }: Props) {
       </div>
 
       {/* Confirmation checkbox */}
-      <label className="flex items-start gap-3 cursor-pointer p-4 bg-[#E8EAF6] rounded-xl border border-indigo-200">
+      <label className="flex items-start gap-3 cursor-pointer p-4 bg-primary-50 rounded-xl border border-primary-200">
         <input
           type="checkbox"
-          className="mt-0.5 accent-[#1A237E] w-4 h-4"
+          className="mt-0.5 accent-amber-600 w-4 h-4"
           checked={confirmed}
           onChange={(e) => setConfirmed(e.target.checked)}
         />
-        <span className="text-sm text-[#1A237E] font-medium">
+        <span className="text-sm text-primary-700 font-medium">
           I confirm that all information provided is accurate and complete. I authorise Kira to
           file this copyright application with KECOBO on my behalf.
         </span>

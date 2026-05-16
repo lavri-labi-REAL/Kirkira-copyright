@@ -99,7 +99,7 @@ export function Step4AdditionalOwners({ application, onUpdate, onNext, onBack }:
             key={String(opt.value)}
             className={`flex items-center gap-2 cursor-pointer px-4 py-3 rounded-lg border transition-colors ${
               hasCoOwners === opt.value
-                ? "border-[#1A237E] bg-[#E8EAF6] text-[#1A237E]"
+                ? "border-primary bg-primary-50 text-primary-700"
                 : "border-gray-200 text-gray-700 hover:border-gray-300"
             }`}
           >

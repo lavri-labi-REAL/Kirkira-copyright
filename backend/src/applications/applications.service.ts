@@ -1,13 +1,14 @@
 import {
   Injectable,
   NotFoundException,
-  ForbiddenException,
   BadRequestException,
 } from "@nestjs/common";
 import { PrismaService } from "../prisma/prisma.service";
 import { FilingQueueService } from "../queue/filing-queue.service";
 import { ApplicationStatus, Prisma } from "@prisma/client";
 import { UpdateApplicationDto } from "./dto/update-application.dto";
+
+const GUEST_USER_ID = "00000000-0000-0000-0000-000000000001";
 
 @Injectable()
 export class ApplicationsService {
@@ -16,7 +17,21 @@ export class ApplicationsService {
     private queue: FilingQueueService
   ) {}
 
+  private async ensureGuestUser() {
+    await this.prisma.user.upsert({
+      where: { id: GUEST_USER_ID },
+      update: {},
+      create: {
+        id: GUEST_USER_ID,
+        email: "guest@kira.co.ke",
+        password: "not-used",
+        full_name: "Kira User",
+      },
+    });
+  }
+
   async create(userId: string) {
+    await this.ensureGuestUser();
     return this.prisma.application.create({
       data: { user_id: userId, status: "DRAFT", wizard_step: 1 },
       include: { documents: true },
@@ -24,6 +39,7 @@ export class ApplicationsService {
   }
 
   async findAll(userId: string) {
+    await this.ensureGuestUser();
     return this.prisma.application.findMany({
       where: { user_id: userId },
       include: { documents: true },
@@ -31,18 +47,17 @@ export class ApplicationsService {
     });
   }
 
-  async findOne(id: string, userId: string) {
+  async findOne(id: string) {
     const app = await this.prisma.application.findUnique({
       where: { id },
       include: { documents: true, audit_logs: { orderBy: { created_at: "desc" } } },
     });
     if (!app) throw new NotFoundException("Application not found");
-    if (app.user_id !== userId) throw new ForbiddenException();
     return app;
   }
 
-  async update(id: string, userId: string, dto: UpdateApplicationDto) {
-    await this.findOne(id, userId);
+  async update(id: string, dto: UpdateApplicationDto) {
+    await this.findOne(id);
     return this.prisma.application.update({
       where: { id },
       data: {
@@ -65,8 +80,8 @@ export class ApplicationsService {
     });
   }
 
-  async confirmFiling(id: string, userId: string) {
-    const app = await this.findOne(id, userId);
+  async confirmFiling(id: string) {
+    const app = await this.findOne(id);
 
     if (app.status !== "DRAFT" && app.status !== "REJECTED") {
       throw new BadRequestException(`Cannot file application with status: ${app.status}`);
@@ -74,7 +89,6 @@ export class ApplicationsService {
 
     this.validateReadyForFiling(app);
 
-    // Transition to READY_FOR_FILING
     const updated = await this.prisma.application.update({
       where: { id },
       data: { status: "READY_FOR_FILING" },
@@ -90,7 +104,6 @@ export class ApplicationsService {
       },
     });
 
-    // Enqueue the Playwright filing job
     const job = await this.prisma.filingJob.create({
       data: {
         application_id: id,
@@ -104,8 +117,8 @@ export class ApplicationsService {
     return updated;
   }
 
-  async delete(id: string, userId: string) {
-    const app = await this.findOne(id, userId);
+  async delete(id: string) {
+    const app = await this.findOne(id);
     if (app.status !== "DRAFT") {
       throw new BadRequestException("Only draft applications can be deleted");
     }

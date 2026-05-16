@@ -77,9 +77,9 @@ export function Step3ConfirmProfile({ application, onUpdate, onNext, onBack }: P
         </p>
       </div>
 
-      <div className="bg-[#E8EAF6] border border-indigo-200 rounded-lg p-3 flex items-center gap-2">
-        <User className="w-5 h-5 text-[#1A237E]" />
-        <span className="text-sm text-[#1A237E]">
+      <div className="bg-primary-50 border border-primary-200 rounded-lg p-3 flex items-center gap-2">
+        <User className="w-5 h-5 text-primary-700" />
+        <span className="text-sm text-primary-700">
           Review and complete your details below. All fields marked * are required.
         </span>
       </div>
@@ -93,7 +93,7 @@ export function Step3ConfirmProfile({ application, onUpdate, onNext, onBack }: P
           <label key={String(opt.value)} className="flex items-center gap-2 cursor-pointer">
             <input
               type="radio"
-              className="accent-[#1A237E]"
+              className="accent-amber-600"
               checked={profile.is_corporate === opt.value}
               onChange={() => set("is_corporate", opt.value)}
             />
@@ -103,7 +103,7 @@ export function Step3ConfirmProfile({ application, onUpdate, onNext, onBack }: P
       </div>
 
       {profile.is_corporate && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-indigo-50 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-primary-50 rounded-lg">
           <Input
             label="Company / Organisation Name"
             required

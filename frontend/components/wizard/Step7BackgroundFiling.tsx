@@ -25,7 +25,7 @@ export function Step7BackgroundFiling({ application }: Props) {
         <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center">
           <CheckCircle className="w-10 h-10 text-green-500" />
         </div>
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[#1A237E] flex items-center justify-center">
+        <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary flex items-center justify-center">
           <Loader className="w-4 h-4 text-white animate-spin" />
         </div>
       </div>
@@ -38,17 +38,17 @@ export function Step7BackgroundFiling({ application }: Props) {
         </p>
       </div>
 
-      <div className="bg-[#E8EAF6] rounded-xl p-5 w-full max-w-sm text-left space-y-2">
-        <div className="flex items-center gap-2 text-[#1A237E]">
+      <div className="bg-primary-50 rounded-xl p-5 w-full max-w-sm text-left space-y-2">
+        <div className="flex items-center gap-2 text-primary-700">
           <CheckCircle className="w-4 h-4 text-green-500" />
           <span className="text-sm font-medium">Application data saved</span>
         </div>
-        <div className="flex items-center gap-2 text-[#1A237E]">
+        <div className="flex items-center gap-2 text-primary-700">
           <CheckCircle className="w-4 h-4 text-green-500" />
           <span className="text-sm font-medium">Documents uploaded</span>
         </div>
-        <div className="flex items-center gap-2 text-[#1A237E]">
-          <Loader className="w-4 h-4 text-[#1A237E] animate-spin" />
+        <div className="flex items-center gap-2 text-primary-700">
+          <Loader className="w-4 h-4 text-primary-700 animate-spin" />
           <span className="text-sm font-medium">Filing with KECOBO...</span>
         </div>
         <div className="flex items-center gap-2 text-gray-400">

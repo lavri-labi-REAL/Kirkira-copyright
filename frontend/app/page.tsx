@@ -81,25 +81,19 @@ export default function HomePage() {
             </span>
           </h1>
 
-          <p className="text-indigo-200 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-orange-100 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
             Kira guides you through KECOBO copyright filing in&nbsp;6 simple steps. Our solution
             classifies your work, our wizard captures the data, and our automation files directly
             with KECOBO on your behalf.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex justify-center">
             <Link
-              href="/login"
+              href="/dashboard"
               className="btn btn-lg bg-white text-primary hover:bg-primary-50 shadow-lg shadow-black/20"
             >
               Start Filing Now
               <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/login"
-              className="btn btn-lg bg-white/10 text-white border border-white/20 backdrop-blur-sm hover:bg-white/20"
-            >
-              Sign In
             </Link>
           </div>
 
@@ -111,7 +105,7 @@ export default function HomePage() {
               "All 6 Wizard Steps",
               "Automated Certificate Delivery",
             ].map((t) => (
-              <div key={t} className="flex items-center gap-2 text-indigo-300 text-sm">
+              <div key={t} className="flex items-center gap-2 text-orange-100 text-sm">
                 <CheckCircle className="w-4 h-4 text-accent flex-shrink-0" />
                 {t}
               </div>
@@ -160,11 +154,11 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {STEPS.map((s, i) => (
               <div
                 key={s.n}
-                className={`card card-body relative overflow-hidden ${i === 5 ? "sm:col-span-2 lg:col-span-1" : ""}`}
+                className="card card-body relative overflow-hidden"
               >
                 <span className="absolute -top-3 -right-2 text-7xl font-black text-primary/5 select-none leading-none">
                   {s.n}
@@ -218,7 +212,7 @@ export default function HomePage() {
                 Create your free account and file your first copyright in minutes.
               </p>
               <Link
-                href="/login"
+                href="/dashboard"
                 className="btn btn-lg bg-white text-primary hover:bg-primary-50 shadow-lg"
               >
                 Get Started for Free

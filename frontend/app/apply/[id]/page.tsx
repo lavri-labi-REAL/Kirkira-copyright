@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import { AppShell } from "../../../components/layout/AppShell";
 import { WizardProgress } from "../../../components/wizard/WizardProgress";
 import { Step1DescribeWork } from "../../../components/wizard/Step1DescribeWork";
@@ -15,7 +15,6 @@ import { Save } from "lucide-react";
 
 export default function WizardPage() {
   const { id } = useParams<{ id: string }>();
-  const router  = useRouter();
   const [application, setApplication] = useState<any>(null);
   const [step, setStep]               = useState(1);
   const [loading, setLoading]         = useState(true);
@@ -23,7 +22,6 @@ export default function WizardPage() {
   const [error, setError]             = useState("");
 
   useEffect(() => {
-    if (!localStorage.getItem("kira_token")) { router.push("/login"); return; }
     applications.get(id)
       .then((app) => {
         setApplication(app);
@@ -34,7 +32,7 @@ export default function WizardPage() {
       })
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [id, router]);
+  }, [id]);
 
   const handleUpdate = useCallback(async (data: Record<string, any>) => {
     const updated = await applications.update(id, data);
@@ -71,7 +69,7 @@ export default function WizardPage() {
   return (
     <AppShell>
       {/* Thin top accent line */}
-      <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary/40" />
+      <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary-300" />
 
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
 

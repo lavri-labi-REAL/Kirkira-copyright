@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "../../components/layout/AppShell";
 import { StatusBadge } from "../../components/ui/StatusBadge";
@@ -9,27 +8,25 @@ import { Alert } from "../../components/ui/Alert";
 import { applications } from "../../lib/api";
 import {
   Plus, FileText, Download, Edit, Clock,
-  ChevronRight, CheckCircle, Loader, AlertCircle, Eye,
+  CheckCircle, Loader, AlertCircle, Eye,
 } from "lucide-react";
 
 export default function Dashboard() {
   const [apps, setApps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
-    if (!localStorage.getItem("kira_token")) { router.push("/login"); return; }
     applications.list()
       .then(setApps)
       .catch((e) => setError(e.message))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, []);
 
   const handleNew = async () => {
     try {
       const app = await applications.create();
-      router.push(`/apply/${app.id}`);
+      window.location.href = `/apply/${app.id}`;
     } catch (e: any) { setError(e.message); }
   };
 
@@ -106,7 +103,6 @@ export default function Dashboard() {
 }
 
 function AppCard({ app, onRefresh }: { app: any; onRefresh: () => void }) {
-  const router = useRouter();
   const hasCert = app.documents?.some((d: any) => d.type === "CERTIFICATE");
 
   const iconBg: Record<string,string> = {
@@ -173,12 +169,12 @@ function AppCard({ app, onRefresh }: { app: any; onRefresh: () => void }) {
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {app.status === "DRAFT" && (
-            <button onClick={() => router.push(`/apply/${app.id}`)} className="btn btn-sm btn-primary">
+            <button onClick={() => { window.location.href = `/apply/${app.id}`; }} className="btn btn-sm btn-primary">
               <Edit className="w-3.5 h-3.5" /> Continue
             </button>
           )}
           {app.status === "REJECTED" && (
-            <button onClick={() => router.push(`/apply/${app.id}`)} className="btn btn-sm btn-secondary">
+            <button onClick={() => { window.location.href = `/apply/${app.id}`; }} className="btn btn-sm btn-secondary">
               <Edit className="w-3.5 h-3.5" /> Resubmit
             </button>
           )}

@@ -75,9 +75,15 @@ export class LlmService {
       });
 
       raw = (response.content[0] as any).text.trim();
-    } catch (err) {
-      this.logger.error("Anthropic API call failed", err);
-      throw err;
+    } catch (err: any) {
+      this.logger.error("Anthropic API call failed", err?.message ?? err);
+      return {
+        category_id: "",
+        subcategory_id: "",
+        confidence: 0,
+        explanation: "Automated classification is unavailable. Please select the category manually.",
+        is_uncertain: true,
+      };
     }
 
     let parsed: {
