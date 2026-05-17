@@ -8,7 +8,7 @@ import { Alert } from "../../components/ui/Alert";
 import { applications } from "../../lib/api";
 import {
   Plus, FileText, Download, Edit, Clock,
-  CheckCircle, Loader, AlertCircle, Eye,
+  CheckCircle, Loader, AlertCircle, Eye, Trash2,
 } from "lucide-react";
 
 export default function Dashboard() {
@@ -103,6 +103,21 @@ export default function Dashboard() {
 }
 
 function AppCard({ app, onRefresh }: { app: any; onRefresh: () => void }) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!confirmDelete) { setConfirmDelete(true); return; }
+    setDeleting(true);
+    try {
+      await applications.delete(app.id);
+      onRefresh();
+    } catch {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
+
   const hasCert = app.documents?.some((d: any) => d.type === "CERTIFICATE");
 
   const iconBg: Record<string,string> = {
@@ -182,6 +197,26 @@ function AppCard({ app, onRefresh }: { app: any; onRefresh: () => void }) {
             <button className="btn btn-sm bg-green-50 text-green-700 border border-green-200 hover:bg-green-100">
               <Download className="w-3.5 h-3.5" /> Certificate
             </button>
+          )}
+          {app.status === "DRAFT" && (
+            confirmDelete ? (
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="btn btn-sm bg-red-500 text-white hover:bg-red-600 disabled:opacity-50"
+              >
+                {deleting ? <Loader className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {deleting ? "Deleting…" : "Confirm"}
+              </button>
+            ) : (
+              <button
+                onClick={handleDelete}
+                className="btn btn-sm btn-ghost text-gray-400 hover:text-red-500 hover:bg-red-50 !px-2"
+                title="Delete application"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )
           )}
           <Link href={`/applications/${app.id}`} className="btn btn-sm btn-ghost text-gray-400 hover:text-gray-600 !px-2">
             <Eye className="w-4 h-4" />

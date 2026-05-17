@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kira Copyright Filing",
+  title: "KIRA Copyright Filing",
   description: "Register your copyright with KECOBO — automated, guided, secure.",
 };
 

@@ -124,9 +124,6 @@ export default function ApplicationDetailPage() {
             <Row label="Subcategory" value={subcategory?.label} />
             <Row label="Title" value={app.title} />
             <Row label="Description" value={app.description} />
-            {app.llm_confidence && (
-              <Row label="AI Confidence" value={`${Math.round(app.llm_confidence * 100)}%`} />
-            )}
           </Section>
 
           <Section title="Applicant Profile" icon={User}>

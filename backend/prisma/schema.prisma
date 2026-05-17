@@ -151,3 +151,20 @@ enum JobStatus {
   COMPLETED
   FAILED
 }
+
+// ─── Inquiries ────────────────────────────────────────────────────────────────
+
+model Inquiry {
+  id          String   @id @default(uuid())
+  full_name   String
+  email       String
+  phone       String?
+  company     String?
+  service     String   // "trademark" | "industrial_design" | "patent"
+  description String   @db.Text
+  notes       String?  @db.Text
+  status      String   @default("new") // "new" | "contacted" | "closed"
+  created_at  DateTime @default(now())
+
+  @@map("inquiries")
+}

@@ -147,7 +147,7 @@ export function Step6ReviewConfirm({ application, onConfirm, onBack }: Props) {
           onChange={(e) => setConfirmed(e.target.checked)}
         />
         <span className="text-sm text-primary-700 font-medium">
-          I confirm that all information provided is accurate and complete. I authorise Kira to
+          I confirm that all information provided is accurate and complete. I authorise KIRA to
           file this copyright application with KECOBO on my behalf.
         </span>
       </label>

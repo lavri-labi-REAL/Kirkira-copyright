@@ -4,7 +4,6 @@ import { ReactNode } from "react";
 import { AuthProvider } from "../../lib/auth-context";
 import { Navbar } from "./Navbar";
 import Link from "next/link";
-import { Shield } from "lucide-react";
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
@@ -16,8 +15,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <Shield className="w-5 h-5 text-primary" />
-                <span className="font-bold text-white text-sm">Kira Copyright</span>
+                <span className="font-bold text-sm tracking-widest uppercase">
+                  <span className="text-primary">K</span><span className="text-white">IRA</span>
+                </span>
               </div>
               <div className="flex flex-wrap gap-6 text-xs text-gray-500">
                 <span>KECOBO Copyright Filing System</span>
@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </Link>
               </div>
               <p className="text-xs text-gray-600">
-                © {new Date().getFullYear()} Kira · All rights reserved
+                © {new Date().getFullYear()} KIRA · All rights reserved
               </p>
             </div>
           </div>

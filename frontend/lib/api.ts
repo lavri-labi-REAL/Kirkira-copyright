@@ -90,6 +90,24 @@ export const categories = {
     request<any>(`/categories/${catId}/subcategories/${subId}`),
 };
 
+// ─── Inquiries ────────────────────────────────────────────────────────────────
+
+export const inquiries = {
+  submit: (data: {
+    full_name: string;
+    email: string;
+    phone?: string;
+    company?: string;
+    service: string;
+    description: string;
+    notes?: string;
+  }) =>
+    request<{ id: string }>("/inquiries", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
+
 // ─── Documents ────────────────────────────────────────────────────────────────
 
 export const documents = {

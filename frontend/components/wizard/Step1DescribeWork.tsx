@@ -127,9 +127,6 @@ export function Step1DescribeWork({ application, onUpdate, onNext }: Props) {
               ) : (
                 <p className="text-sm font-medium text-green-800">
                   Suggestion: {classification.subcategory_id}
-                  <span className="ml-2 text-xs font-normal">
-                    ({Math.round(classification.confidence * 100)}% confidence)
-                  </span>
                 </p>
               )}
               <p className="text-xs text-gray-600 mt-1">{classification.explanation}</p>

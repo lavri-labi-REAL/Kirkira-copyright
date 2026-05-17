@@ -2,6 +2,8 @@ import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import Anthropic from "@anthropic-ai/sdk";
 import * as categoriesSchema from "../../data/categories.json";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface ClassificationResult {
   category_id: string;
@@ -50,25 +52,31 @@ Respond with ONLY valid JSON in this exact structure:
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
-  private client: Anthropic;
 
-  constructor(private config: ConfigService) {
-    this.client = new Anthropic({
-      apiKey: this.config.get("ANTHROPIC_API_KEY"),
-    });
-  }
+  constructor(private config: ConfigService) {}
 
   async classifyWork(description: string): Promise<ClassificationResult> {
+    const apiKey = this.readEnvKey("ANTHROPIC_API_KEY");
+    const model = this.readEnvKey("ANTHROPIC_MODEL") || "claude-opus-4-7";
     const threshold =
-      parseFloat(this.config.get("LLM_CONFIDENCE_THRESHOLD", "0.75")) ||
-      CONFIDENCE_THRESHOLD;
+      parseFloat(this.readEnvKey("LLM_CONFIDENCE_THRESHOLD") || "0.75") || CONFIDENCE_THRESHOLD;
 
+    if (!apiKey || apiKey.startsWith("sk-ant-...")) {
+      this.logger.warn("ANTHROPIC_API_KEY is not set — classification unavailable");
+      return {
+        category_id: "", subcategory_id: "", confidence: 0,
+        explanation: "Automated classification is unavailable. Please select the category manually.",
+        is_uncertain: true,
+      };
+    }
+
+    const client = new Anthropic({ apiKey });
     const userMessage = `Please classify this copyright work:\n\n"${description}"`;
 
     let raw: string;
     try {
-      const response = await this.client.messages.create({
-        model: this.config.get("ANTHROPIC_MODEL", "claude-opus-4-7"),
+      const response = await client.messages.create({
+        model,
         max_tokens: 512,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: userMessage }],
@@ -76,7 +84,7 @@ export class LlmService {
 
       raw = (response.content[0] as any).text.trim();
     } catch (err: any) {
-      this.logger.error("Anthropic API call failed", err?.message ?? err);
+      this.logger.error(`Anthropic API call failed [status=${err?.status}]: ${err?.message ?? err}`);
       return {
         category_id: "",
         subcategory_id: "",
@@ -125,5 +133,18 @@ export class LlmService {
 
   getCategories() {
     return categoriesSchema;
+  }
+
+  // Reads directly from .env file to bypass empty system environment variables
+  // that would otherwise shadow the file values via process.env / ConfigService.
+  private readEnvKey(key: string): string {
+    try {
+      const envPath = path.join(process.cwd(), ".env");
+      const content = fs.readFileSync(envPath, "utf8");
+      const match = content.match(new RegExp(`^${key}="?([^"\\n\\r]+)"?`, "m"));
+      return match?.[1]?.trim() || "";
+    } catch {
+      return this.config.get<string>(key, "");
+    }
   }
 }

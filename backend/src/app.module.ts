@@ -9,6 +9,7 @@ import { LlmModule } from "./llm/llm.module";
 import { QueueModule } from "./queue/queue.module";
 import { SchedulerModule } from "./scheduler/scheduler.module";
 import { CategoriesModule } from "./categories/categories.module";
+import { InquiriesModule } from "./inquiries/inquiries.module";
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CategoriesModule } from "./categories/categories.module";
     QueueModule,
     SchedulerModule,
     CategoriesModule,
+    InquiriesModule,
   ],
 })
 export class AppModule {}

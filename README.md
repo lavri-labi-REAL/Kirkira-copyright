@@ -1,115 +1,132 @@
-# Kirkira KECOBO Copyright Filing System
+# KIRA — Kenya Innovation Rights Accelerator
 
-Automated copyright registration with Kenya's Copyright Board (KECOBO / NRR).
+An IP services platform built for [kira.co.ke](https://kira.co.ke), combining licensed IP lawyers with digital automation. Currently live for copyright registration (KECOBO), with trademark, industrial design, and patent services integrated via lawyer inquiry flow.
+
+## Services
+
+| Service | Status | Description |
+|---------|--------|-------------|
+| **Copyright** | ✅ Live | Automated KECOBO / NRR filing with AI-assisted classification |
+| **Trademark** | ✅ Live | Lawyer-managed KIPI filing (via kira.co.ke) |
+| **Industrial Design** | 🟡 Enquire | Lawyer inquiry → KIPI registration |
+| **Patent** | 🟡 Enquire | Lawyer inquiry → KIPI / ARIPO / PCT filing |
+
+---
 
 ## Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 14, TypeScript, Tailwind CSS (Kirkira theme) |
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
 | Backend | NestJS, TypeScript, Prisma ORM |
 | Database | PostgreSQL |
 | Queue | BullMQ + Redis |
-| LLM | Anthropic Claude (claude-opus-4-7) |
-| Automation | Playwright (Chromium) |
-| Auth | JWT (passport-jwt) |
+| Classification | Anthropic Claude (`claude-opus-4-7`) |
+| Portal Automation | Playwright (Chromium) |
+
+> **Auth:** The app runs in guest mode — no login required. It is designed to be embedded within kira.co.ke which handles authentication externally. A `GUEST_USER_ID` constant is used; swap it for an injected user ID when integrating.
+
+---
 
 ## Repository Structure
 
 ```
 kira-copyright/
-├── frontend/          # Next.js app — 7-step wizard, dashboard, detail view
-│   ├── app/           # Next.js App Router pages
-│   │   ├── page.tsx              # Landing / home
-│   │   ├── login/page.tsx        # Login + register
-│   │   ├── dashboard/page.tsx    # Application dashboard
-│   │   ├── apply/[id]/page.tsx   # Wizard orchestrator
-│   │   └── applications/[id]/page.tsx  # Read-only detail view
+├── frontend/                    # Next.js app
+│   ├── app/
+│   │   ├── page.tsx             # Services landing page (4 service cards)
+│   │   ├── trademark-service/   # Trademark service detail + SEO page
+│   │   ├── copyright-service/   # Copyright service detail + SEO page
+│   │   ├── industrial-design-service/  # Industrial design detail + SEO page
+│   │   ├── patents-service/     # Patent service detail + SEO page
+│   │   ├── dashboard/           # Application dashboard (list + delete drafts)
+│   │   ├── apply/[id]/          # 6-step filing wizard orchestrator
+│   │   ├── applications/[id]/   # Read-only application detail view
+│   │   └── login/               # Redirects to dashboard (auth handled externally)
 │   ├── components/
-│   │   ├── ui/        # Design system (Button, Input, Card, Alert, StatusBadge)
-│   │   ├── layout/    # Navbar, AppShell
-│   │   └── wizard/    # 7 step components + DocumentUploader
-│   ├── lib/           # api.ts (typed API client), auth-context.tsx
-│   └── data/          # categories.json (KECOBO schema)
-│
-├── backend/           # NestJS REST API
-│   ├── src/
-│   │   ├── main.ts               # Bootstrap + Swagger
-│   │   ├── app.module.ts
-│   │   ├── auth/                 # JWT auth (register/login)
-│   │   ├── applications/         # CRUD + lifecycle + confirm-filing
-│   │   ├── documents/            # File upload/delete
-│   │   ├── llm/                  # Anthropic classification service
-│   │   ├── categories/           # Schema endpoints
-│   │   ├── queue/                # BullMQ producer
-│   │   ├── scheduler/            # Nightly sync cron
-│   │   └── prisma/               # PrismaService
-│   ├── prisma/
-│   │   ├── schema.prisma         # Full DB schema
-│   │   └── seed.ts               # Test data
+│   │   ├── layout/              # Navbar (KIRA wordmark), AppShell, footer
+│   │   ├── wizard/              # Step1–Step6 wizard components + DocumentUploader
+│   │   └── InquiryModal.tsx     # Lawyer inquiry form (industrial design & patent)
+│   ├── lib/
+│   │   ├── api.ts               # Typed API client (applications, documents, inquiries, classify)
+│   │   └── auth-context.tsx     # No-op stub (auth handled by parent platform)
 │   └── data/
-│       └── categories.json       # KECOBO category schema
+│       └── categories.json      # KECOBO copyright category schema
 │
-├── worker/            # Playwright automation
+├── backend/                     # NestJS REST API
+│   ├── src/
+│   │   ├── applications/        # CRUD, lifecycle, confirm-filing, delete
+│   │   ├── documents/           # File upload / delete
+│   │   ├── llm/                 # Anthropic classification (graceful fallback)
+│   │   ├── categories/          # Schema endpoints
+│   │   ├── inquiries/           # Lawyer inquiry submission + listing
+│   │   ├── queue/               # BullMQ producer
+│   │   ├── scheduler/           # Nightly sync cron
+│   │   └── prisma/              # PrismaService
+│   ├── prisma/
+│   │   ├── schema.prisma        # DB schema (User, Application, Document, AuditLog, FilingJob, Inquiry)
+│   │   └── seed.ts              # Test data
+│   └── data/
+│       └── categories.json      # KECOBO category schema (shared with frontend)
+│
+├── worker/                      # Playwright KECOBO portal automation
 │   └── src/
-│       ├── kecobo-client.ts      # Browser automation (login, file, sync)
-│       ├── filing-worker.ts      # BullMQ consumer for filing jobs
-│       ├── nightly-sync.ts       # BullMQ consumer for sync jobs
-│       └── index.ts              # Entry point (starts both workers)
+│       ├── kecobo-client.ts     # Browser automation (login, file, sync)
+│       ├── filing-worker.ts     # BullMQ consumer — initial filing jobs
+│       ├── nightly-sync.ts      # BullMQ consumer — status sync jobs
+│       └── index.ts             # Entry point
 │
-├── shared/            # Shared TypeScript types
-│   └── src/types/index.ts
-│
-├── docs/
-│   ├── sequence-diagram.md       # Full ASCII sequence diagram
-│   ├── llm-prompts.md            # Prompt templates + confidence logic
-│   └── api-reference.md          # REST endpoint documentation
-│
-├── docker-compose.yml            # postgres + redis + all services
-├── .env.example                  # All required environment variables
-└── kecobo_categories_schema_v1.0.0.json  # Master category schema
+├── shared/                      # Shared TypeScript types
+├── docs/                        # Sequence diagrams, API reference, LLM prompts
+├── docker-compose.yml
+└── .env.example
 ```
+
+---
 
 ## Quick Start
 
-### 1. Prerequisites
+### Prerequisites
 
 - Node.js 20+
 - Docker + Docker Compose
 
-### 2. Environment Setup
+### 1. Environment
 
 ```bash
 cp .env.example .env
-# Edit .env with your Anthropic API key and KECOBO credentials
+# Required: ANTHROPIC_API_KEY, DATABASE_URL, REDIS_URL
+# Optional: KECOBO_USERNAME, KECOBO_PASSWORD (needed for portal automation only)
 ```
 
-### 3. Start Infrastructure
+### 2. Infrastructure
 
 ```bash
 docker-compose up postgres redis -d
 ```
 
-### 4. Backend
+### 3. Backend
 
 ```bash
 cd backend
 npm install
 npx prisma generate
 npx prisma migrate dev --name init
-npx ts-node prisma/seed.ts
 npm run dev
+# Runs on http://localhost:3001
+# Swagger: http://localhost:3001/api/docs
 ```
 
-### 5. Frontend
+### 4. Frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev
+# Runs on http://localhost:3000
 ```
 
-### 6. Worker
+### 5. Worker (optional — KECOBO portal automation)
 
 ```bash
 cd worker
@@ -118,70 +135,86 @@ npx playwright install chromium
 npm run dev
 ```
 
-Open: http://localhost:3000
-
 ---
 
 ## Configuration
 
-All config is via environment variables — see `.env.example`.
-
-Key variables:
-
 | Variable | Description |
 |----------|-------------|
-| `ANTHROPIC_API_KEY` | Anthropic API key for LLM classification |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `REDIS_URL` | Redis connection string (BullMQ) |
+| `ANTHROPIC_API_KEY` | Anthropic API key for work classification |
 | `ANTHROPIC_MODEL` | Model ID (default: `claude-opus-4-7`) |
-| `LLM_CONFIDENCE_THRESHOLD` | Float 0–1, below this → "uncertain" (default: 0.75) |
-| `KECOBO_URL` | KECOBO portal URL |
+| `LLM_CONFIDENCE_THRESHOLD` | Float 0–1, below this → manual selection prompt (default: `0.75`) |
+| `KECOBO_URL` | KECOBO NRR portal URL |
 | `KECOBO_USERNAME` | Portal login email |
 | `KECOBO_PASSWORD` | Portal login password |
 | `PLAYWRIGHT_HEADLESS` | `true` for production, `false` for debugging |
-| `NIGHTLY_SYNC_CRON` | Cron expression (default: `0 21 * * *` = midnight EAT) |
+| `NIGHTLY_SYNC_CRON` | Cron expression for status sync (default: `0 21 * * *` = midnight EAT) |
 
 ---
 
-## Implementation Priorities (Dev Sequence)
+## Key Design Decisions
 
-| # | Module | Status |
-|---|--------|--------|
-| 1 | Data & Schema | ✅ `categories.json` + Prisma schema |
-| 2 | Wizard UX | ✅ All 7 steps implemented |
-| 3 | LLM Classification | ✅ Anthropic API integration |
-| 4 | Validation Layer | ✅ Server-side + client-side |
-| 5 | Playwright MVP | ✅ Literary category (generalised to all) |
-| 6 | Nightly Sync Job | ✅ BullMQ consumer + scheduler |
+- **No auth in this app** — runs as a guest session; authentication is handled by the parent kira.co.ke platform. The `GUEST_USER_ID` constant (`00000000-0000-0000-0000-000000000001`) is used until user injection is wired up.
+- **Graceful LLM fallback** — if the Anthropic API call fails, classification returns `is_uncertain: true` and the user selects the category manually. No hard failures.
+- **Inquiry model** — industrial design and patent services collect lawyer inquiries via a modal form stored in the `inquiries` table. Status tracked as `new → contacted → closed`.
+- **Two-click delete** — draft applications can be deleted from the dashboard with a two-step confirmation pattern (no modal).
+- **Service detail pages** — `/trademark-service`, `/copyright-service`, `/industrial-design-service`, `/patents-service` serve as SEO landing pages with full service descriptions, benefits, and process steps.
 
 ---
 
-## Playwright Note
+## Feature Status
 
-The `KECOBOClient` uses CSS selectors that match the **general pattern** of KECOBO/NRR portal UI.
-When the portal is accessible for testing, run:
-
-```bash
-PLAYWRIGHT_HEADLESS=false npm run test:filing
-```
-
-This opens a visible browser so you can observe the automation and adjust selectors in
-`worker/src/kecobo-client.ts` to match the live portal's HTML exactly.
-
-Screenshots of every step are saved to `worker/screenshots/` for debugging.
+| Feature | Status |
+|---------|--------|
+| Services landing page | ✅ |
+| 6-step copyright filing wizard | ✅ |
+| Automated KECOBO / NRR filing (Playwright) | ✅ |
+| Work classification (Anthropic) | ✅ |
+| Nightly status sync | ✅ |
+| Application dashboard + delete | ✅ |
+| Lawyer inquiry form (industrial design & patent) | ✅ |
+| SEO service detail pages (×4) | ✅ |
+| Trademark filing (KIPI) | 🔜 Planned |
+| Industrial design filing (KIPI) | 🔜 Planned |
+| Patent filing (KIPI / PCT) | 🔜 Planned |
+| kira.co.ke auth integration | 🔜 Planned |
 
 ---
 
 ## API Documentation
 
-Swagger UI is available at: `http://localhost:3001/api/docs`
+Swagger UI: `http://localhost:3001/api/docs`
 
-Full REST reference: [docs/api-reference.md](docs/api-reference.md)
+Full reference: [docs/api-reference.md](docs/api-reference.md)
+
+## Playwright Debugging
+
+```bash
+PLAYWRIGHT_HEADLESS=false npm run test:filing
+```
+
+Opens a visible browser to observe portal automation. Screenshots saved to `worker/screenshots/`.
 
 ---
 
-## Sequence Diagram
+## Troubleshooting
 
-[docs/sequence-diagram.md](docs/sequence-diagram.md)
+### AI classification always returns "unavailable" (Windows)
 
-## LLM Prompt Templates
+**Symptom:** The Classify button falls back to manual selection even though `ANTHROPIC_API_KEY` is set in `backend/.env`.
 
-[docs/llm-prompts.md](docs/llm-prompts.md)
+**Cause:** On Windows, `dotenv` does not override variables that already exist in the system environment. If `ANTHROPIC_API_KEY` was ever set (even as an empty string) via *System Properties → Environment Variables*, it shadows the `.env` value.
+
+**Fix:** Remove `ANTHROPIC_API_KEY` from your Windows system environment variables:
+
+1. Open **System Properties** → **Advanced** → **Environment Variables**
+2. Under *System variables* (or *User variables*), delete the `ANTHROPIC_API_KEY` entry
+3. Restart your terminal and re-run `npm run dev` in the backend
+
+The backend reads the key directly from the `.env` file as a fallback, so the app will work correctly once the conflicting system variable is removed.
+
+### Classification endpoint returns 201 instead of 200
+
+NestJS defaults `@Post()` endpoints to HTTP 201. This is expected behaviour — the frontend handles both `200` and `201` as success responses.

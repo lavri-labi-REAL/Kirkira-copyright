@@ -1,112 +1,219 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { AppShell } from "../components/layout/AppShell";
-import { Shield, Zap, FileCheck, Search, ArrowRight, CheckCircle, Star } from "lucide-react";
+import { InquiryModal } from "../components/InquiryModal";
+import {
+  ArrowRight, CheckCircle, Shield, Pen, Lightbulb, FlaskConical,
+  Star, MessageSquare,
+} from "lucide-react";
 
-const FEATURES = [
+type ServiceId = "trademark" | "copyright" | "industrial-design" | "patent";
+
+interface Service {
+  id: ServiceId;
+  icon: React.ElementType;
+  label: string;
+  tagline: string;
+  description: string;
+  highlights: string[];
+  cta: string;
+  href?: string;
+  learnMore: string;
+  featured: "primary" | "secondary" | false;
+  badge: string;
+  inquiry?: boolean;
+}
+
+const SERVICES: Service[] = [
   {
-    icon: Zap,
-    color: "bg-primary-50 text-primary",
-    title: "Automated Classification",
-    desc: "Describe your work in plain language. Our solution identifies the correct KECOBO category and subcategory in seconds.",
-  },
-  {
-    icon: FileCheck,
-    color: "bg-accent-50 text-accent-600",
-    title: "Guided 6-Step Wizard",
-    desc: "We tell you exactly what documents you need before you start. Progress is saved automatically after every step.",
-  },
-  {
+    id: "trademark",
     icon: Shield,
-    color: "bg-success/10 text-success-dark",
-    title: "Automated Filing",
-    desc: "We file your application directly on the KECOBO/NRR portal using secure browser automation — no manual effort.",
+    label: "Trademark",
+    tagline: "Protect your brand identity",
+    description:
+      "Register your brand name, logo, or slogan with KIPI. A licensed IP lawyer reviews your application before submission to maximise approval chances and protect your business identity.",
+    highlights: [
+      "Brand name & logo registration",
+      "Expert lawyer review before filing",
+      "KIPI portal filing & follow-up",
+      "Trademark search included",
+    ],
+    cta: "Start Filing",
+    href: "https://kira.co.ke",
+    learnMore: "/trademark-service",
+    featured: "primary",
+    badge: "Live",
   },
   {
-    icon: Search,
-    color: "bg-warning/10 text-warning-dark",
-    title: "Nightly Status Sync",
-    desc: "We check KECOBO every night and deliver your certificate the moment it's approved.",
+    id: "copyright",
+    icon: Pen,
+    label: "Copyright",
+    tagline: "Protect your creative work",
+    description:
+      "Secure ownership of your creative work — music, literature, software, art, film, and more. Our automated system classifies your work, completes the application, and files directly with KECOBO.",
+    highlights: [
+      "Automated work classification",
+      "Automated KECOBO / NRR filing",
+      "Nightly status sync & certificate delivery",
+      "All 7 copyright categories covered",
+    ],
+    cta: "Start Filing",
+    learnMore: "/copyright-service",
+    featured: "secondary",
+    badge: "Live",
+  },
+  {
+    id: "industrial-design",
+    icon: FlaskConical,
+    label: "Industrial Design",
+    tagline: "Safeguard your product's appearance",
+    description:
+      "Protect the unique visual appearance of your product. Our lawyers will guide you through the KIPI registration process from design drawings to granted certificate.",
+    highlights: [
+      "Product appearance protection",
+      "Design drawing preparation support",
+      "KIPI registration & prosecution",
+      "12-year renewable protection",
+    ],
+    cta: "Get in Touch",
+    learnMore: "/industrial-design-service",
+    featured: false,
+    badge: "Enquire",
+    inquiry: true,
+  },
+  {
+    id: "patent",
+    icon: Lightbulb,
+    label: "Patent",
+    tagline: "Protect your invention",
+    description:
+      "Protect your invention with structured legal support. A licensed patent lawyer prepares your specification, claims, and drawings for filing with KIPI or via PCT.",
+    highlights: [
+      "Invention novelty assessment",
+      "Specification & claims drafting",
+      "KIPI & PCT filing support",
+      "20-year protection term",
+    ],
+    cta: "Get in Touch",
+    learnMore: "/patents-service",
+    featured: false,
+    badge: "Enquire",
+    inquiry: true,
   },
 ];
 
-const CATEGORIES = [
-  "Literary Works",
-  "Musical Works",
-  "Artistic Works",
-  "Dramatic Works",
-  "Audio-Visual Works",
-  "Sound Recordings",
-  "Broadcasts",
+const STATS = [
+  { value: "4", label: "IP Service Areas" },
+  { value: "100%", label: "Lawyer-Reviewed Trademarks" },
+  { value: "24h", label: "Avg. Response Time" },
+  { value: "KE", label: "Kenya's IP Platform" },
 ];
 
-const STEPS = [
-  { n: "01", title: "Describe Your Work", desc: "Type a short description. Our solution suggests the right category instantly." },
-  { n: "02", title: "Preview Requirements", desc: "See the exact fields and documents required before you upload anything." },
-  { n: "03", title: "Profile & Co-Owners", desc: "Your profile is pre-filled and snapshotted. Add any co-authors or joint owners." },
-  { n: "04", title: "Work Details & Uploads", desc: "Fill category-specific fields and upload your documents securely." },
-  { n: "05", title: "Review & Confirm", desc: "Read-only summary of everything before you authorise filing." },
-  { n: "06", title: "Background Filing", desc: "We queue and automate the KECOBO submission. You're done instantly." },
+const HOW_IT_WORKS = [
+  {
+    n: "01",
+    title: "Choose Your Service",
+    desc: "Select the type of IP protection you need — copyright, trademark, patent, or industrial design.",
+  },
+  {
+    n: "02",
+    title: "Complete the Guided Wizard",
+    desc: "Our step-by-step wizard collects exactly what's needed. Auto-saved at every step so you never lose progress.",
+  },
+  {
+    n: "03",
+    title: "We File on Your Behalf",
+    desc: "Our automation files your application directly with the relevant authority — KECOBO or KIPI.",
+  },
+  {
+    n: "04",
+    title: "Receive Your Certificate",
+    desc: "Track your status in real time. Your certificate is delivered straight to your dashboard the moment it's issued.",
+  },
 ];
 
-export default function HomePage() {
+export default function ServicesPage() {
+  const [inquiryService, setInquiryService] = useState<ServiceId | null>(null);
+  const [starting, setStarting] = useState(false);
+
+  async function startCopyrightFiling() {
+    if (starting) return;
+    setStarting(true);
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/api/v1/applications`,
+        { method: "POST", headers: { "Content-Type": "application/json" } }
+      );
+      const app = await res.json();
+      window.location.href = `/apply/${app.id}`;
+    } catch {
+      setStarting(false);
+    }
+  }
+
+  const activeInquiry = SERVICES.find((s) => s.id === inquiryService);
+
   return (
     <AppShell>
-      {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-hero-gradient">
-        {/* Subtle grid overlay */}
+
+      {/* ── Inquiry Modal ────────────────────────────────────────────────── */}
+      {inquiryService && activeInquiry && (
+        <InquiryModal
+          service={inquiryService}
+          serviceLabel={activeInquiry.label}
+          onClose={() => setInquiryService(null)}
+        />
+      )}
+
+      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden bg-white">
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
-            backgroundSize: "48px 48px",
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='13' y='26' font-size='18' font-weight='300' fill='%23F59E0B' opacity='0.25' font-family='sans-serif'%3E%2B%3C/text%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
           }}
         />
-        {/* Glow orb */}
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-accent/20 blur-[100px] pointer-events-none" />
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-24 sm:py-32 text-center">
-          {/* Pill badge */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 text-sm text-white/90 mb-8">
-            <Star className="w-3.5 h-3.5 text-accent fill-accent" />
-            Powered by Revolution Analytics Ltd
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-center">
+          <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-200 rounded-full px-4 py-1.5 text-sm text-primary-700 font-medium mb-8">
+            <Star className="w-3.5 h-3.5 text-primary fill-primary" />
+            Kenya Innovation Rights Accelerator (KIRA)
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.1] tracking-tight mb-6">
-            Register Your Copyright
-            <span className="block mt-1 text-transparent bg-clip-text bg-gradient-to-r from-accent to-cyan-300">
-              Without the Paperwork
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 leading-[1.1] tracking-tight mb-6">
+            Protect What You
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent mt-1">
+              Create & Build
             </span>
           </h1>
 
-          <p className="text-orange-100 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-            Kira guides you through KECOBO copyright filing in&nbsp;6 simple steps. Our solution
-            classifies your work, our wizard captures the data, and our automation files directly
-            with KECOBO on your behalf.
+          <p className="text-gray-500 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+            KIRA unites licensed IP lawyers with digital automation — giving you expert‑level
+            accuracy at modern‑tech speed. Trademark, copyright, design, and patent
+            registration, all in one place.
           </p>
 
-          <div className="flex justify-center">
-            <Link
-              href="/dashboard"
-              className="btn btn-lg bg-white text-primary hover:bg-primary-50 shadow-lg shadow-black/20"
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+              href="#services"
+              className="btn btn-lg btn-primary"
             >
-              Start Filing Now
+              Explore Services
               <ArrowRight className="w-5 h-5" />
-            </Link>
+            </a>
           </div>
 
-          {/* Trust bar */}
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-8">
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-8">
             {[
               "Kenya Copyright Act 2001",
               "KECOBO / NRR Portal",
-              "All 6 Wizard Steps",
-              "Automated Certificate Delivery",
+              "KIPI Registration",
+              "Secure & Confidential",
             ].map((t) => (
-              <div key={t} className="flex items-center gap-2 text-orange-100 text-sm">
-                <CheckCircle className="w-4 h-4 text-accent flex-shrink-0" />
+              <div key={t} className="flex items-center gap-2 text-gray-400 text-sm">
+                <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
                 {t}
               </div>
             ))}
@@ -114,114 +221,251 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Features ─────────────────────────────────────────── */}
-      <section className="py-24 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="section-eyebrow">How it works</p>
-            <h2 className="section-title">Four pillars that handle everything</h2>
-            <p className="section-subtitle mx-auto">
-              From classification to certificate — Kira automates every step of KECOBO filing.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="card-hover card-body flex flex-col gap-4 group"
-              >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${f.color} transition-transform duration-200 group-hover:scale-110`}>
-                  <f.icon className="w-6 h-6" />
-                </div>
-                <h3 className="font-bold text-gray-900 text-lg">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed flex-1">{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── 7-Step Process ───────────────────────────────────── */}
-      <section className="py-24 px-4 bg-slate-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="section-eyebrow">The wizard</p>
-            <h2 className="section-title">6 steps. Fully guided. Auto-saved.</h2>
-            <p className="section-subtitle mx-auto">
-              Every step is designed to collect the minimum required information, with your
-              progress saved automatically so you never lose work.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {STEPS.map((s, i) => (
-              <div
-                key={s.n}
-                className="card card-body relative overflow-hidden"
-              >
-                <span className="absolute -top-3 -right-2 text-7xl font-black text-primary/5 select-none leading-none">
-                  {s.n}
-                </span>
-                <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold mb-4">
-                    {parseInt(s.n)}
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-1.5">{s.title}</h3>
-                  <p className="text-gray-500 text-sm leading-relaxed">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Categories ───────────────────────────────────────── */}
-      <section className="py-24 px-4 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="section-eyebrow">Coverage</p>
-          <h2 className="section-title">All KECOBO copyright categories</h2>
-          <p className="section-subtitle mx-auto mb-12">
-            Under the Kenya Copyright Act No.&nbsp;12 of 2001 (as amended 2022). 27 subcategories,
-            all supported.
-          </p>
-
-          <div className="flex flex-wrap gap-3 justify-center mb-16">
-            {CATEGORIES.map((cat, i) => (
-              <span
-                key={cat}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold border-2 transition-colors ${
-                  i === 0
-                    ? "bg-primary text-white border-primary"
-                    : "bg-white text-gray-700 border-gray-200 hover:border-primary/30 hover:bg-primary-50"
-                }`}
-              >
-                {cat}
-              </span>
-            ))}
-          </div>
-
-          {/* CTA */}
-          <div className="bg-hero-gradient rounded-3xl p-10 sm:p-14 relative overflow-hidden">
-            <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-accent/20 blur-[60px]" />
-            <div className="relative">
-              <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                Ready to protect your work?
-              </h3>
-              <p className="text-indigo-200 mb-8 text-lg">
-                Create your free account and file your first copyright in minutes.
+      {/* ── Services ─────────────────────────────────────────────────────── */}
+      <section id="services" className="py-20 px-4 bg-gray-50">
+        <div
+          className="relative"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='13' y='26' font-size='18' font-weight='300' fill='%23F59E0B' opacity='0.15' font-family='sans-serif'%3E%2B%3C/text%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        >
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-14">
+              <p className="section-eyebrow">Our Services</p>
+              <h2 className="section-title">
+                <span className="text-primary">+ </span>Services
+              </h2>
+              <p className="section-subtitle mx-auto">
+                Choose the type of protection you need. Click a service card to get started or enquire.
               </p>
-              <Link
-                href="/dashboard"
-                className="btn btn-lg bg-white text-primary hover:bg-primary-50 shadow-lg"
-              >
-                Get Started for Free
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {SERVICES.map((svc) => {
+                const Icon = svc.icon;
+
+                /* ── Primary featured card (Trademark — orange) ── */
+                if (svc.featured === "primary") {
+                  return (
+                    <div
+                      key={svc.id}
+                      className="group relative bg-primary rounded-2xl p-8 flex flex-col gap-5 shadow-hover transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <span className="text-xs font-bold bg-white text-primary px-2.5 py-1 rounded-full">
+                          {svc.badge}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-white mb-1">{svc.label}</h3>
+                        <p className="text-orange-100 text-sm font-medium mb-3">{svc.tagline}</p>
+                        <p className="text-orange-100 text-sm leading-relaxed">{svc.description}</p>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {svc.highlights.map((h) => (
+                          <li key={h} className="flex items-center gap-2 text-sm text-white">
+                            <CheckCircle className="w-4 h-4 text-white/70 flex-shrink-0" />
+                            {h}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto pt-2 flex items-center justify-between">
+                        <a
+                          href={svc.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm font-bold text-white hover:gap-3 transition-all"
+                        >
+                          {svc.cta} <ArrowRight className="w-4 h-4" />
+                        </a>
+                        <a
+                          href={svc.learnMore}
+                          className="text-xs text-white/70 hover:text-white underline underline-offset-2 transition-colors"
+                        >
+                          Learn more
+                        </a>
+                      </div>
+                    </div>
+                  );
+                }
+
+                /* ── Secondary featured card (Copyright — amber tinted) ── */
+                if (svc.featured === "secondary") {
+                  return (
+                    <div
+                      key={svc.id}
+                      className="group relative bg-amber-50 border-2 border-primary/30 rounded-2xl p-8 flex flex-col gap-5 transition-transform duration-200 hover:-translate-y-1 hover:shadow-xl hover:border-primary/60"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                          <Icon className="w-6 h-6 text-primary" />
+                        </div>
+                        <span className="text-xs font-bold bg-primary text-white px-2.5 py-1 rounded-full">
+                          {svc.badge}
+                        </span>
+                      </div>
+                      <div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-1">{svc.label}</h3>
+                        <p className="text-primary text-sm font-medium mb-3">{svc.tagline}</p>
+                        <p className="text-gray-600 text-sm leading-relaxed">{svc.description}</p>
+                      </div>
+                      <ul className="space-y-1.5">
+                        {svc.highlights.map((h) => (
+                          <li key={h} className="flex items-center gap-2 text-sm text-gray-700">
+                            <CheckCircle className="w-4 h-4 text-primary flex-shrink-0" />
+                            {h}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="mt-auto pt-2 flex items-center justify-between">
+                        <button
+                          onClick={startCopyrightFiling}
+                          disabled={starting}
+                          className="inline-flex items-center gap-1.5 text-sm font-bold text-primary hover:gap-3 transition-all disabled:opacity-60 disabled:cursor-wait"
+                        >
+                          {starting ? "Starting…" : svc.cta} <ArrowRight className="w-4 h-4" />
+                        </button>
+                        <a href={svc.learnMore} className="text-xs text-primary/60 hover:text-primary underline underline-offset-2 transition-colors">
+                          Learn more
+                        </a>
+                      </div>
+                    </div>
+                  );
+                }
+
+                /* ── Inquiry cards (Industrial Design & Patent) ── */
+                return (
+                  <div
+                    key={svc.id}
+                    className="relative bg-white rounded-2xl p-8 flex flex-col gap-5 border border-gray-200 hover:border-primary/30 hover:shadow-md transition-all duration-200"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="w-12 h-12 rounded-xl bg-primary-50 flex items-center justify-center">
+                        <Icon className="w-6 h-6 text-primary" />
+                      </div>
+                      <span className="text-xs font-bold bg-primary-50 text-primary-700 px-2.5 py-1 rounded-full">
+                        {svc.badge}
+                      </span>
+                    </div>
+
+                    <div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-1">{svc.label}</h3>
+                      <p className="text-primary text-sm font-medium mb-3">{svc.tagline}</p>
+                      <p className="text-gray-500 text-sm leading-relaxed">{svc.description}</p>
+                    </div>
+
+                    <ul className="space-y-1.5">
+                      {svc.highlights.map((h) => (
+                        <li key={h} className="flex items-center gap-2 text-sm text-gray-500">
+                          <CheckCircle className="w-4 h-4 text-primary/50 flex-shrink-0" />
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-auto pt-2 space-y-2">
+                      <button
+                        onClick={() => setInquiryService(svc.id)}
+                        className="btn btn-primary w-full"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        {svc.cta}
+                      </button>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-gray-400">A lawyer responds within 1 business day</p>
+                        <Link href={svc.learnMore} className="text-xs text-primary/60 hover:text-primary underline underline-offset-2 transition-colors">
+                          Learn more
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
+
+      {/* ── Stats ────────────────────────────────────────────────────────── */}
+      <section className="py-16 px-4 bg-white border-y border-gray-100">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+          {STATS.map((s) => (
+            <div key={s.label}>
+              <div className="text-4xl font-extrabold text-primary mb-1">{s.value}</div>
+              <div className="text-sm text-gray-500">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── How It Works ─────────────────────────────────────────────────── */}
+      <section className="py-20 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-14">
+            <p className="section-eyebrow">How It Works</p>
+            <h2 className="section-title">Our 4-Step Process</h2>
+            <p className="section-subtitle mx-auto">
+              From first click to official certificate — we handle every step on your behalf.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {HOW_IT_WORKS.map((step, i) => (
+              <div key={step.n} className="relative">
+                {i < HOW_IT_WORKS.length - 1 && (
+                  <div className="hidden lg:block absolute top-6 left-[calc(100%-12px)] w-6 h-0.5 bg-primary-200 z-10" />
+                )}
+                <div className="card card-body h-full">
+                  <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold mb-4 flex-shrink-0">
+                    {parseInt(step.n)}
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA Banner ───────────────────────────────────────────────────── */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div
+          className="relative"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Ctext x='13' y='26' font-size='18' font-weight='300' fill='%23F59E0B' opacity='0.2' font-family='sans-serif'%3E%2B%3C/text%3E%3C/svg%3E")`,
+            backgroundRepeat: "repeat",
+          }}
+        >
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-primary rounded-3xl p-10 sm:p-14 relative overflow-hidden">
+              <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-white/10 blur-[60px]" />
+              <div className="absolute -bottom-12 -left-12 w-48 h-48 rounded-full bg-accent/20 blur-[50px]" />
+              <div className="relative flex flex-col sm:flex-row items-center justify-between gap-8">
+                <div>
+                  <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+                    Ready to protect your brand or creative work?
+                  </h3>
+                  <p className="text-orange-100 text-lg">
+                    Our lawyers and digital platform work together so your IP is filed correctly, quickly, and with full legal backing.
+                  </p>
+                </div>
+                <a
+                  href="#services"
+                  className="flex-shrink-0 btn btn-lg bg-white text-primary hover:bg-primary-50 shadow-lg whitespace-nowrap"
+                >
+                  Our Services →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </AppShell>
   );
 }
